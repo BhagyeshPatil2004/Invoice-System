@@ -1,0 +1,53 @@
+{
+  "name": "invoice-management-system",
+  "version": "1.0.0",
+  "description": "A comprehensive invoice management system for freelancers and SMBs",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "dev:client": "cd client && npm run dev",
+    "dev:server": "cd server && npm run dev",
+    "build": "npm run build:client && npm run build:server",
+    "build:client": "cd client && npm run build",
+    "build:server": "cd server && npm run build",
+    "start": "cd server && npm start",
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install",
+    "clean": "rimraf client/node_modules server/node_modules node_modules client/build server/build",
+    "lint": "npm run lint:client && npm run lint:server",
+    "lint:client": "cd client && npm run lint",
+    "lint:server": "cd server && npm run lint",
+    "test": "npm run test:client && npm run test:server",
+    "test:client": "cd client && npm test",
+    "test:server": "cd server && npm test"
+  },
+  "keywords": [
+    "invoice",
+    "billing",
+    "accounting",
+    "freelancer",
+    "small-business",
+    "react",
+    "nodejs",
+    "typescript",
+    "supabase",
+    "firebase"
+  ],
+  "author": "Bhagyesh Patil <bhagyeshpatil2004@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/BhagyeshPatil2004/Invoice-System.git"
+  },
+  "bugs": {
+    "url": "https://github.com/BhagyeshPatil2004/Invoice-System/issues"
+  },
+  "homepage": "https://github.com/BhagyeshPatil2004/Invoice-System#readme",
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "rimraf": "^5.0.5"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  }
+}
