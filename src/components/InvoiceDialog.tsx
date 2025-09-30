@@ -191,9 +191,7 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
                   <SelectValue placeholder="Select client" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="acme">Acme Corporation</SelectItem>
-                  <SelectItem value="techstart">TechStart Inc</SelectItem>
-                  <SelectItem value="digital">Digital Agency Pro</SelectItem>
+                  {/* No clients available yet */}
                 </SelectContent>
               </Select>
             </div>
