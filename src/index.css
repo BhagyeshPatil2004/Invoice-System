@@ -135,3 +135,10 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  /* Hover Scale Animation */
+  .hover-scale {
+    @apply transition-transform duration-200 ease-out hover:scale-105;
+  }
+}
