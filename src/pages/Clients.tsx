@@ -140,8 +140,6 @@ export default function Clients() {
                   <TableHead className="font-semibold">Client</TableHead>
                   <TableHead className="font-semibold">Contact</TableHead>
                   <TableHead className="font-semibold">Invoices</TableHead>
-                  <TableHead className="font-semibold">Total Amount</TableHead>
-                  <TableHead className="font-semibold">Outstanding</TableHead>
                   <TableHead className="font-semibold text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -172,18 +170,6 @@ export default function Clients() {
                         Last: {client.lastInvoice}
                       </div>
                     </TableCell>
-                     <TableCell>
-                       <div className="font-medium text-foreground">
-                         ₹{client.totalAmount.toLocaleString()}
-                       </div>
-                     </TableCell>
-                     <TableCell>
-                       <div className={`font-medium ${
-                         client.outstanding > 0 ? 'text-warning' : 'text-success'
-                       }`}>
-                         ₹{client.outstanding.toLocaleString()}
-                       </div>
-                     </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
