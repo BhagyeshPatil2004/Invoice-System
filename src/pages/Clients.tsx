@@ -4,7 +4,6 @@ import ClientDialog from "@/components/ClientDialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
 import {
   Table,
   TableBody,
@@ -19,20 +18,58 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-const getStatusBadge = (status: string) => {
-  return status === "active" 
-    ? "bg-success/10 text-success border-success/20"
-    : "bg-muted text-muted-foreground border-border";
-};
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
 
 export default function Clients() {
   const [clients, setClients] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [selectedClient, setSelectedClient] = useState<any>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
+  const { toast } = useToast();
 
   const handleClientCreate = (newClient: any) => {
     setClients([...clients, newClient]);
+  };
+
+  const handleViewDetails = (client: any) => {
+    setSelectedClient(client);
+    setViewDetailsOpen(true);
+  };
+
+  const handleEditClient = (client: any) => {
+    toast({
+      title: "Edit Feature",
+      description: "Edit functionality will be implemented soon",
+    });
+  };
+
+  const handleDeleteClick = (client: any) => {
+    setSelectedClient(client);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (selectedClient) {
+      setClients(clients.filter(c => c.id !== selectedClient.id));
+      toast({
+        title: "Client Deleted",
+        description: "Client has been successfully removed",
+      });
+      setDeleteDialogOpen(false);
+      setSelectedClient(null);
+    }
   };
   
   const filteredClients = clients.filter(client => 
@@ -92,7 +129,6 @@ export default function Clients() {
                   <TableHead className="font-semibold">Invoices</TableHead>
                   <TableHead className="font-semibold">Total Amount</TableHead>
                   <TableHead className="font-semibold">Outstanding</TableHead>
-                  <TableHead className="font-semibold">Status</TableHead>
                   <TableHead className="font-semibold text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -135,11 +171,6 @@ export default function Clients() {
                          ₹{client.outstanding.toLocaleString()}
                        </div>
                      </TableCell>
-                    <TableCell>
-                      <Badge className={getStatusBadge(client.status)}>
-                        {client.status.charAt(0).toUpperCase() + client.status.slice(1)}
-                      </Badge>
-                    </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
@@ -148,15 +179,18 @@ export default function Clients() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleViewDetails(client)}>
                             <Eye className="h-4 w-4 mr-2" />
                             View Details
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleEditClient(client)}>
                             <Edit className="h-4 w-4 mr-2" />
                             Edit Client
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="text-danger">
+                          <DropdownMenuItem 
+                            className="text-destructive"
+                            onClick={() => handleDeleteClick(client)}
+                          >
                             <Trash2 className="h-4 w-4 mr-2" />
                             Delete Client
                           </DropdownMenuItem>
@@ -199,6 +233,79 @@ export default function Clients() {
           </CardContent>
         </Card>
       </div>
+
+      {/* View Details Dialog */}
+      <AlertDialog open={viewDetailsOpen} onOpenChange={setViewDetailsOpen}>
+        <AlertDialogContent className="max-w-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Client Details</AlertDialogTitle>
+            <AlertDialogDescription>
+              Complete information about {selectedClient?.name}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          {selectedClient && (
+            <div className="grid grid-cols-2 gap-4 py-4">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Client Name</p>
+                <p className="text-base text-foreground">{selectedClient.name}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Company</p>
+                <p className="text-base text-foreground">{selectedClient.company || "N/A"}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Email</p>
+                <p className="text-base text-foreground">{selectedClient.email}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Phone</p>
+                <p className="text-base text-foreground">{selectedClient.phone || "N/A"}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">GSTIN</p>
+                <p className="text-base text-foreground">{selectedClient.gstin || "N/A"}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Total Invoices</p>
+                <p className="text-base text-foreground">{selectedClient.totalInvoices}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Total Amount</p>
+                <p className="text-base text-foreground">₹{selectedClient.totalAmount?.toLocaleString()}</p>
+              </div>
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Outstanding</p>
+                <p className="text-base text-warning">₹{selectedClient.outstanding?.toLocaleString()}</p>
+              </div>
+              <div className="col-span-2">
+                <p className="text-sm font-medium text-muted-foreground">Address</p>
+                <p className="text-base text-foreground">{selectedClient.address || "N/A"}</p>
+              </div>
+            </div>
+          )}
+          <AlertDialogFooter>
+            <AlertDialogAction>Close</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete {selectedClient?.name}. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
