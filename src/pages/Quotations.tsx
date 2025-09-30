@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { Plus, Search, MoreHorizontal, Edit, Eye, Send, Download, FileText } from "lucide-react";
-import InvoiceDialog from "@/components/InvoiceDialog";
+import { Plus, Search, MoreHorizontal, Edit, Eye, Send, Download, FileText, CheckCircle, XCircle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,102 +19,77 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-// Mock data for demonstration
-const invoices = [
+const quotations = [
   {
-    id: "INV-001",
+    id: "QUO-001",
     clientName: "Acme Corporation",
     amount: 2500,
-    status: "paid",
+    status: "sent",
     issueDate: "2024-01-15",
-    dueDate: "2024-02-15",
+    validUntil: "2024-02-15",
     description: "Web Development Services"
   },
   {
-    id: "INV-002", 
+    id: "QUO-002", 
     clientName: "TechStart Inc",
     amount: 1750,
-    status: "pending",
+    status: "accepted",
     issueDate: "2024-01-18",
-    dueDate: "2024-02-18",
+    validUntil: "2024-02-18",
     description: "UI/UX Design Package"
   },
   {
-    id: "INV-003",
+    id: "QUO-003",
     clientName: "Digital Agency Pro",
     amount: 3200,
-    status: "overdue",
+    status: "declined",
     issueDate: "2024-01-05",
-    dueDate: "2024-01-20",
+    validUntil: "2024-02-05",
     description: "SEO Optimization Services"
   },
   {
-    id: "INV-004",
+    id: "QUO-004",
     clientName: "Creative Studio Ltd",
     amount: 890,
     status: "draft",
     issueDate: "2024-01-20",
-    dueDate: "2024-02-20",
+    validUntil: "2024-02-20",
     description: "Logo Design Project"
-  },
-  {
-    id: "INV-005",
-    clientName: "Startup Hub",
-    amount: 4500,
-    status: "sent",
-    issueDate: "2024-01-22",
-    dueDate: "2024-02-22",
-    description: "Full Stack Development"
   }
 ];
 
 const getStatusBadge = (status: string) => {
   const variants = {
-    paid: "bg-success/10 text-success border-success/20",
-    pending: "bg-warning/10 text-warning border-warning/20",
+    accepted: "bg-success/10 text-success border-success/20",
     sent: "bg-primary/10 text-primary border-primary/20",
-    overdue: "bg-danger/10 text-danger border-danger/20",
+    declined: "bg-danger/10 text-danger border-danger/20",
     draft: "bg-muted text-muted-foreground border-border"
   };
   
   return variants[status as keyof typeof variants] || variants.draft;
 };
 
-const getStatusColor = (status: string) => {
-  const colors = {
-    paid: "text-success",
-    pending: "text-warning", 
-    sent: "text-primary",
-    overdue: "text-danger",
-    draft: "text-muted-foreground"
-  };
-  
-  return colors[status as keyof typeof colors] || colors.draft;
-};
-
-export default function Invoices() {
+export default function Quotations() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
   
-  const filteredInvoices = invoices.filter(invoice => 
-    invoice.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    invoice.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    invoice.description.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredQuotations = quotations.filter(quote => 
+    quote.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    quote.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    quote.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const totalAmount = invoices.reduce((sum, invoice) => sum + invoice.amount, 0);
-  const paidAmount = invoices.filter(i => i.status === 'paid').reduce((sum, invoice) => sum + invoice.amount, 0);
-  const pendingAmount = invoices.filter(i => i.status === 'pending' || i.status === 'sent').reduce((sum, invoice) => sum + invoice.amount, 0);
+  const totalAmount = quotations.reduce((sum, quote) => sum + quote.amount, 0);
+  const acceptedAmount = quotations.filter(q => q.status === 'accepted').reduce((sum, quote) => sum + quote.amount, 0);
+  const pendingAmount = quotations.filter(q => q.status === 'sent').reduce((sum, quote) => sum + quote.amount, 0);
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <InvoiceDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />
       {/* Page Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Invoices</h1>
+          <h1 className="text-3xl font-bold text-foreground">Quotations</h1>
           <p className="text-muted-foreground mt-1">
-            Create, manage, and track all your business invoices
+            Create and manage quotations for your clients
           </p>
         </div>
         <div className="flex gap-3">
@@ -123,9 +97,9 @@ export default function Invoices() {
             <FileText className="h-4 w-4 mr-2" />
             Import
           </Button>
-          <Button className="hover-scale" onClick={() => setIsDialogOpen(true)}>
+          <Button className="hover-scale">
             <Plus className="h-4 w-4 mr-2" />
-            Create Invoice
+            Create Quotation
           </Button>
         </div>
       </div>
@@ -137,15 +111,15 @@ export default function Invoices() {
             <div className="text-2xl font-bold text-foreground">
               ${totalAmount.toLocaleString()}
             </div>
-            <p className="text-sm text-muted-foreground">Total Invoiced</p>
+            <p className="text-sm text-muted-foreground">Total Quoted</p>
           </CardContent>
         </Card>
         <Card className="hover:shadow-md transition-shadow">
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-success">
-              ${paidAmount.toLocaleString()}
+              ${acceptedAmount.toLocaleString()}
             </div>
-            <p className="text-sm text-muted-foreground">Paid</p>
+            <p className="text-sm text-muted-foreground">Accepted</p>
           </CardContent>
         </Card>
         <Card className="hover:shadow-md transition-shadow">
@@ -159,19 +133,19 @@ export default function Invoices() {
         <Card className="hover:shadow-md transition-shadow">
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-foreground">
-              {invoices.length}
+              {quotations.length}
             </div>
-            <p className="text-sm text-muted-foreground">Total Invoices</p>
+            <p className="text-sm text-muted-foreground">Total Quotations</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Invoices Table */}
+      {/* Quotations Table */}
       <Card>
         <CardHeader>
-          <CardTitle>All Invoices</CardTitle>
+          <CardTitle>All Quotations</CardTitle>
           <CardDescription>
-            Manage and track your invoice status and payments
+            Manage your quotations and track client responses
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -179,7 +153,7 @@ export default function Invoices() {
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input 
-                placeholder="Search invoices by ID, client, or description..." 
+                placeholder="Search quotations by ID, client, or description..." 
                 className="pl-10"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -198,48 +172,42 @@ export default function Invoices() {
             <Table>
               <TableHeader>
                 <TableRow className="bg-muted/50">
-                  <TableHead className="font-semibold">Invoice</TableHead>
+                  <TableHead className="font-semibold">Quotation</TableHead>
                   <TableHead className="font-semibold">Client</TableHead>
                   <TableHead className="font-semibold">Amount</TableHead>
                   <TableHead className="font-semibold">Status</TableHead>
                   <TableHead className="font-semibold">Issue Date</TableHead>
-                  <TableHead className="font-semibold">Due Date</TableHead>
+                  <TableHead className="font-semibold">Valid Until</TableHead>
                   <TableHead className="font-semibold text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredInvoices.map((invoice) => (
-                  <TableRow key={invoice.id} className="hover:bg-accent/50 transition-colors">
+                {filteredQuotations.map((quote) => (
+                  <TableRow key={quote.id} className="hover:bg-accent/50 transition-colors">
                     <TableCell>
                       <div>
-                        <div className="font-medium text-foreground">{invoice.id}</div>
-                        <div className="text-sm text-muted-foreground">{invoice.description}</div>
+                        <div className="font-medium text-foreground">{quote.id}</div>
+                        <div className="text-sm text-muted-foreground">{quote.description}</div>
                       </div>
                     </TableCell>
                     <TableCell>
-                      <div className="font-medium text-foreground">{invoice.clientName}</div>
+                      <div className="font-medium text-foreground">{quote.clientName}</div>
                     </TableCell>
                     <TableCell>
-                      <div className={`font-semibold ${getStatusColor(invoice.status)}`}>
-                        ${invoice.amount.toLocaleString()}
+                      <div className="font-semibold text-foreground">
+                        ${quote.amount.toLocaleString()}
                       </div>
                     </TableCell>
                     <TableCell>
-                      <Badge className={getStatusBadge(invoice.status)}>
-                        {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
+                      <Badge className={getStatusBadge(quote.status)}>
+                        {quote.status.charAt(0).toUpperCase() + quote.status.slice(1)}
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <div className="text-foreground">{invoice.issueDate}</div>
+                      <div className="text-foreground">{quote.issueDate}</div>
                     </TableCell>
                     <TableCell>
-                      <div className={`${
-                        invoice.status === 'overdue' 
-                          ? 'text-danger font-medium' 
-                          : 'text-foreground'
-                      }`}>
-                        {invoice.dueDate}
-                      </div>
+                      <div className="text-foreground">{quote.validUntil}</div>
                     </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
@@ -251,15 +219,19 @@ export default function Invoices() {
                         <DropdownMenuContent align="end" className="w-48">
                           <DropdownMenuItem>
                             <Eye className="h-4 w-4 mr-2" />
-                            View Invoice
+                            View Quotation
                           </DropdownMenuItem>
                           <DropdownMenuItem>
                             <Edit className="h-4 w-4 mr-2" />
-                            Edit Invoice
+                            Edit Quotation
                           </DropdownMenuItem>
                           <DropdownMenuItem>
                             <Send className="h-4 w-4 mr-2" />
                             Send to Client
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="text-success">
+                            <CheckCircle className="h-4 w-4 mr-2" />
+                            Convert to Invoice
                           </DropdownMenuItem>
                           <DropdownMenuItem>
                             <Download className="h-4 w-4 mr-2" />
@@ -274,10 +246,10 @@ export default function Invoices() {
             </Table>
           </div>
 
-          {filteredInvoices.length === 0 && (
+          {filteredQuotations.length === 0 && (
             <div className="text-center py-12 text-muted-foreground">
               <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No invoices found matching your search.</p>
+              <p>No quotations found matching your search.</p>
             </div>
           )}
         </CardContent>

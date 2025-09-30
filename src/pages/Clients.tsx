@@ -87,7 +87,7 @@ export default function Clients() {
   );
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       {/* Page Header */}
       <div className="flex justify-between items-center">
         <div>
@@ -96,7 +96,7 @@ export default function Clients() {
             Manage your client relationships and contact information
           </p>
         </div>
-        <Button>
+        <Button className="hover-scale">
           <Plus className="h-4 w-4 mr-2" />
           Add New Client
         </Button>
@@ -142,7 +142,7 @@ export default function Clients() {
               </TableHeader>
               <TableBody>
                 {filteredClients.map((client) => (
-                  <TableRow key={client.id} className="hover:bg-accent/50">
+                  <TableRow key={client.id} className="hover:bg-accent/50 transition-colors">
                     <TableCell>
                       <div>
                         <div className="font-medium text-foreground">{client.name}</div>
@@ -224,13 +224,13 @@ export default function Clients() {
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card>
+        <Card className="hover:shadow-md transition-shadow">
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-foreground">{clients.length}</div>
             <p className="text-sm text-muted-foreground">Total Clients</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="hover:shadow-md transition-shadow">
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-success">
               {clients.filter(c => c.status === 'active').length}
@@ -238,7 +238,7 @@ export default function Clients() {
             <p className="text-sm text-muted-foreground">Active Clients</p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="hover:shadow-md transition-shadow">
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-warning">
               ${clients.reduce((sum, client) => sum + client.outstanding, 0).toLocaleString()}

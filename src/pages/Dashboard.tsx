@@ -89,11 +89,11 @@ export default function Dashboard() {
         </div>
 
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in">
         {metrics.map((metric) => {
           const IconComponent = metric.icon;
           return (
-            <Card key={metric.title} className="border-border/50 shadow-sm hover:shadow-md transition-shadow">
+            <Card key={metric.title} className="border-border/50 shadow-sm hover:shadow-md transition-all hover-scale">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium text-muted-foreground">
                   {metric.title}

@@ -7,6 +7,10 @@ import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import Clients from "./pages/Clients";
 import Invoices from "./pages/Invoices";
+import Quotations from "./pages/Quotations";
+import Receivables from "./pages/Receivables";
+import Payables from "./pages/Payables";
+import Reports from "./pages/Reports";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -35,30 +39,22 @@ const App = () => (
           } />
           <Route path="/quotations" element={
             <Layout>
-              <div className="flex items-center justify-center h-64">
-                <p className="text-muted-foreground">Quotations page coming soon...</p>
-              </div>
+              <Quotations />
             </Layout>
           } />
           <Route path="/receivables" element={
             <Layout>
-              <div className="flex items-center justify-center h-64">
-                <p className="text-muted-foreground">Receivables page coming soon...</p>
-              </div>
+              <Receivables />
             </Layout>
           } />
           <Route path="/payables" element={
             <Layout>
-              <div className="flex items-center justify-center h-64">
-                <p className="text-muted-foreground">Payables page coming soon...</p>
-              </div>
+              <Payables />
             </Layout>
           } />
           <Route path="/reports" element={
             <Layout>
-              <div className="flex items-center justify-center h-64">
-                <p className="text-muted-foreground">Reports page coming soon...</p>
-              </div>
+              <Reports />
             </Layout>
           } />
           <Route path="/settings" element={
