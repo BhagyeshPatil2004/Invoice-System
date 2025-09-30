@@ -42,8 +42,10 @@ export default function ClientDialog({ open, onOpenChange, onClientCreate }: Cli
       address,
       gstin,
       status: "active",
-      totalInvoiced: 0,
+      totalAmount: 0,
       outstanding: 0,
+      totalInvoices: 0,
+      lastInvoice: "N/A",
       createdAt: new Date().toISOString().split('T')[0],
     };
 
