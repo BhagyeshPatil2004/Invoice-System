@@ -20,9 +20,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-// Empty initial state
-const invoices: any[] = [];
-
 const getStatusBadge = (status: string) => {
   const variants = {
     paid: "bg-success/10 text-success border-success/20",
@@ -48,8 +45,13 @@ const getStatusColor = (status: string) => {
 };
 
 export default function Invoices() {
+  const [invoices, setInvoices] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const handleInvoiceCreate = (newInvoice: any) => {
+    setInvoices([...invoices, newInvoice]);
+  };
   
   const filteredInvoices = invoices.filter(invoice => 
     invoice.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -63,7 +65,7 @@ export default function Invoices() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <InvoiceDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} />
+      <InvoiceDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} onInvoiceCreate={handleInvoiceCreate} />
       {/* Page Header */}
       <div className="flex justify-between items-center">
         <div>

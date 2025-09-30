@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Plus, Search, MoreHorizontal, Edit, Trash2, Eye, Mail, Phone, Users } from "lucide-react";
+import ClientDialog from "@/components/ClientDialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,9 +20,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-// Empty initial state
-const clients: any[] = [];
-
 const getStatusBadge = (status: string) => {
   return status === "active" 
     ? "bg-success/10 text-success border-success/20"
@@ -29,7 +27,13 @@ const getStatusBadge = (status: string) => {
 };
 
 export default function Clients() {
+  const [clients, setClients] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const handleClientCreate = (newClient: any) => {
+    setClients([...clients, newClient]);
+  };
   
   const filteredClients = clients.filter(client => 
     client.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -39,6 +43,7 @@ export default function Clients() {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      <ClientDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} onClientCreate={handleClientCreate} />
       {/* Page Header */}
       <div className="flex justify-between items-center">
         <div>
@@ -47,7 +52,7 @@ export default function Clients() {
             Manage your client relationships and contact information
           </p>
         </div>
-        <Button className="hover-scale">
+        <Button className="hover-scale" onClick={() => setIsDialogOpen(true)}>
           <Plus className="h-4 w-4 mr-2" />
           Add New Client
         </Button>

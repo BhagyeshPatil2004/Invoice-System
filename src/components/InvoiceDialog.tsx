@@ -24,6 +24,7 @@ import { Separator } from "@/components/ui/separator";
 interface InvoiceDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onInvoiceCreate: (invoice: any) => void;
 }
 
 interface LineItem {
@@ -38,7 +39,7 @@ interface LineItem {
 type TaxType = 'none' | 'gst' | 'igst';
 type TaxRate = 0 | 5 | 12 | 18 | 28;
 
-export default function InvoiceDialog({ open, onOpenChange }: InvoiceDialogProps) {
+export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: InvoiceDialogProps) {
   const { toast } = useToast();
   const [clientId, setClientId] = useState("");
   const [invoiceNumber, setInvoiceNumber] = useState(`INV-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`);
@@ -146,9 +147,24 @@ export default function InvoiceDialog({ open, onOpenChange }: InvoiceDialogProps
       return;
     }
 
+    const newInvoice = {
+      id: invoiceNumber,
+      clientId,
+      clientName: clientId,
+      description: lineItems[0]?.description || "Invoice",
+      amount: calculateGrandTotal(),
+      status: "draft",
+      issueDate,
+      dueDate,
+      notes,
+      lineItems,
+    };
+
+    onInvoiceCreate(newInvoice);
+
     toast({
       title: "Invoice Created Successfully",
-      description: `Invoice ${invoiceNumber} has been created for $${calculateGrandTotal().toFixed(2)}`,
+      description: `Invoice ${invoiceNumber} has been created for ₹${calculateGrandTotal().toFixed(2)}`,
     });
     
     resetForm();

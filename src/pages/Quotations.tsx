@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Plus, Search, MoreHorizontal, Edit, Eye, Send, Download, FileText, CheckCircle, XCircle } from "lucide-react";
+import QuotationDialog from "@/components/QuotationDialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,8 +20,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const quotations: any[] = [];
-
 const getStatusBadge = (status: string) => {
   const variants = {
     accepted: "bg-success/10 text-success border-success/20",
@@ -33,7 +32,13 @@ const getStatusBadge = (status: string) => {
 };
 
 export default function Quotations() {
+  const [quotations, setQuotations] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+  const handleQuotationCreate = (newQuotation: any) => {
+    setQuotations([...quotations, newQuotation]);
+  };
   
   const filteredQuotations = quotations.filter(quote => 
     quote.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -47,6 +52,7 @@ export default function Quotations() {
 
   return (
     <div className="space-y-6 animate-fade-in">
+      <QuotationDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} onQuotationCreate={handleQuotationCreate} />
       {/* Page Header */}
       <div className="flex justify-between items-center">
         <div>
@@ -60,7 +66,7 @@ export default function Quotations() {
             <FileText className="h-4 w-4 mr-2" />
             Import
           </Button>
-          <Button className="hover-scale">
+          <Button className="hover-scale" onClick={() => setIsDialogOpen(true)}>
             <Plus className="h-4 w-4 mr-2" />
             Create Quotation
           </Button>
