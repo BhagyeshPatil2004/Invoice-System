@@ -19,6 +19,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
 
 const getStatusBadge = (status: string) => {
   const variants = {
@@ -48,9 +59,36 @@ export default function Invoices() {
   const [invoices, setInvoices] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
+  const { toast } = useToast();
 
   const handleInvoiceCreate = (newInvoice: any) => {
     setInvoices([...invoices, newInvoice]);
+  };
+
+  const handleDeleteClick = (invoice: any) => {
+    setSelectedInvoice(invoice);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (selectedInvoice) {
+      setInvoices(invoices.filter(inv => inv.id !== selectedInvoice.id));
+      toast({
+        title: "Invoice Deleted",
+        description: "Invoice has been successfully removed",
+      });
+      setDeleteDialogOpen(false);
+      setSelectedInvoice(null);
+    }
+  };
+
+  const handleDownload = (invoice: any) => {
+    toast({
+      title: "Download Started",
+      description: `Downloading invoice ${invoice.id}`,
+    });
   };
   
   const filteredInvoices = invoices.filter(invoice => 
@@ -205,11 +243,14 @@ export default function Invoices() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDownload(invoice)}>
                             <Download className="h-4 w-4 mr-2" />
                             Download PDF
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive">
+                          <DropdownMenuItem 
+                            className="text-destructive"
+                            onClick={() => handleDeleteClick(invoice)}
+                          >
                             <Trash2 className="h-4 w-4 mr-2" />
                             Delete Invoice
                           </DropdownMenuItem>
@@ -230,6 +271,24 @@ export default function Invoices() {
           )}
         </CardContent>
       </Card>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete invoice {selectedInvoice?.id}. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

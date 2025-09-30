@@ -19,6 +19,17 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
 
 const getStatusBadge = (status: string) => {
   const variants = {
@@ -35,9 +46,36 @@ export default function Quotations() {
   const [quotations, setQuotations] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedQuotation, setSelectedQuotation] = useState<any>(null);
+  const { toast } = useToast();
 
   const handleQuotationCreate = (newQuotation: any) => {
     setQuotations([...quotations, newQuotation]);
+  };
+
+  const handleDeleteClick = (quotation: any) => {
+    setSelectedQuotation(quotation);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (selectedQuotation) {
+      setQuotations(quotations.filter(q => q.id !== selectedQuotation.id));
+      toast({
+        title: "Quotation Deleted",
+        description: "Quotation has been successfully removed",
+      });
+      setDeleteDialogOpen(false);
+      setSelectedQuotation(null);
+    }
+  };
+
+  const handleDownload = (quotation: any) => {
+    toast({
+      title: "Download Started",
+      description: `Downloading quotation ${quotation.id}`,
+    });
   };
   
   const filteredQuotations = quotations.filter(quote => 
@@ -186,11 +224,14 @@ export default function Quotations() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleDownload(quote)}>
                             <Download className="h-4 w-4 mr-2" />
                             Download PDF
                           </DropdownMenuItem>
-                          <DropdownMenuItem className="text-destructive">
+                          <DropdownMenuItem 
+                            className="text-destructive"
+                            onClick={() => handleDeleteClick(quote)}
+                          >
                             <Trash2 className="h-4 w-4 mr-2" />
                             Delete Quotation
                           </DropdownMenuItem>
@@ -211,6 +252,24 @@ export default function Quotations() {
           )}
         </CardContent>
       </Card>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete quotation {selectedQuotation?.id}. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

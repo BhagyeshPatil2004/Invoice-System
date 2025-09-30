@@ -208,8 +208,8 @@ export default function QuotationDialog({ open, onOpenChange, onQuotationCreate 
                     <div className="col-span-1">
                       <Label>Tax Rate</Label>
                       <Select
-                        value={item.taxRate.toString()}
-                        onValueChange={(value) => updateLineItem(index, 'taxRate', parseFloat(value))}
+                        value={item.taxRate?.toString() || "0"}
+                        onValueChange={(value) => updateLineItem(index, 'taxRate', parseFloat(value) || 0)}
                       >
                         <SelectTrigger>
                           <SelectValue />
