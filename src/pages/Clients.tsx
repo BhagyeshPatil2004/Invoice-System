@@ -37,10 +37,16 @@ export default function Clients() {
   const [selectedClient, setSelectedClient] = useState<any>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [viewDetailsOpen, setViewDetailsOpen] = useState(false);
+  const [editClient, setEditClient] = useState<any>(null);
   const { toast } = useToast();
 
   const handleClientCreate = (newClient: any) => {
     setClients([...clients, newClient]);
+  };
+
+  const handleClientUpdate = (updatedClient: any) => {
+    setClients(clients.map(c => c.id === updatedClient.id ? updatedClient : c));
+    setEditClient(null);
   };
 
   const handleViewDetails = (client: any) => {
@@ -49,10 +55,8 @@ export default function Clients() {
   };
 
   const handleEditClient = (client: any) => {
-    toast({
-      title: "Edit Feature",
-      description: "Edit functionality will be implemented soon",
-    });
+    setEditClient(client);
+    setIsDialogOpen(true);
   };
 
   const handleDeleteClick = (client: any) => {
@@ -80,7 +84,16 @@ export default function Clients() {
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <ClientDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} onClientCreate={handleClientCreate} />
+      <ClientDialog 
+        open={isDialogOpen} 
+        onOpenChange={(open) => {
+          setIsDialogOpen(open);
+          if (!open) setEditClient(null);
+        }} 
+        onClientCreate={handleClientCreate}
+        onClientUpdate={handleClientUpdate}
+        editClient={editClient}
+      />
       {/* Page Header */}
       <div className="flex justify-between items-center">
         <div>

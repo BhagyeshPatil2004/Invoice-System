@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,9 +10,11 @@ interface ClientDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onClientCreate: (client: any) => void;
+  onClientUpdate?: (client: any) => void;
+  editClient?: any;
 }
 
-export default function ClientDialog({ open, onOpenChange, onClientCreate }: ClientDialogProps) {
+export default function ClientDialog({ open, onOpenChange, onClientCreate, onClientUpdate, editClient }: ClientDialogProps) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -20,6 +22,26 @@ export default function ClientDialog({ open, onOpenChange, onClientCreate }: Cli
   const [address, setAddress] = useState("");
   const [gstin, setGstin] = useState("");
   const { toast } = useToast();
+
+  const isEditMode = !!editClient;
+
+  useEffect(() => {
+    if (editClient) {
+      setName(editClient.name || "");
+      setEmail(editClient.email || "");
+      setPhone(editClient.phone || "");
+      setCompany(editClient.company || "");
+      setAddress(editClient.address || "");
+      setGstin(editClient.gstin || "");
+    } else {
+      setName("");
+      setEmail("");
+      setPhone("");
+      setCompany("");
+      setAddress("");
+      setGstin("");
+    }
+  }, [editClient, open]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,28 +55,47 @@ export default function ClientDialog({ open, onOpenChange, onClientCreate }: Cli
       return;
     }
 
-    const newClient = {
-      id: `CLT-${Date.now()}`,
-      name,
-      email,
-      phone,
-      company,
-      address,
-      gstin,
-      status: "active",
-      totalAmount: 0,
-      outstanding: 0,
-      totalInvoices: 0,
-      lastInvoice: "N/A",
-      createdAt: new Date().toISOString().split('T')[0],
-    };
+    if (isEditMode && editClient) {
+      const updatedClient = {
+        ...editClient,
+        name,
+        email,
+        phone,
+        company,
+        address,
+        gstin,
+      };
 
-    onClientCreate(newClient);
-    
-    toast({
-      title: "Success",
-      description: "Client created successfully",
-    });
+      onClientUpdate?.(updatedClient);
+      
+      toast({
+        title: "Success",
+        description: "Client updated successfully",
+      });
+    } else {
+      const newClient = {
+        id: `CLT-${Date.now()}`,
+        name,
+        email,
+        phone,
+        company,
+        address,
+        gstin,
+        status: "active",
+        totalAmount: 0,
+        outstanding: 0,
+        totalInvoices: 0,
+        lastInvoice: "N/A",
+        createdAt: new Date().toISOString().split('T')[0],
+      };
+
+      onClientCreate(newClient);
+      
+      toast({
+        title: "Success",
+        description: "Client created successfully",
+      });
+    }
 
     // Reset form
     setName("");
@@ -70,8 +111,10 @@ export default function ClientDialog({ open, onOpenChange, onClientCreate }: Cli
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create New Client</DialogTitle>
-          <DialogDescription>Add a new client to your system</DialogDescription>
+          <DialogTitle>{isEditMode ? "Edit Client" : "Create New Client"}</DialogTitle>
+          <DialogDescription>
+            {isEditMode ? "Update client information" : "Add a new client to your system"}
+          </DialogDescription>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -145,7 +188,9 @@ export default function ClientDialog({ open, onOpenChange, onClientCreate }: Cli
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit">Create Client</Button>
+            <Button type="submit">
+              {isEditMode ? "Update Client" : "Create Client"}
+            </Button>
           </div>
         </form>
       </DialogContent>
