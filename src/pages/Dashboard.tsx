@@ -3,12 +3,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 
-// Mock data for demonstration
+// Empty initial state
 const metrics = [
   {
     title: "Total Revenue",
-    value: "$124,500",
-    change: "+12.5%",
+    value: "₹0",
+    change: "+0%",
     trend: "up",
     icon: TrendingUp,
     description: "This month",
@@ -16,8 +16,8 @@ const metrics = [
   },
   {
     title: "Outstanding",
-    value: "$28,750",
-    change: "-5.2%",
+    value: "₹0",
+    change: "0%",
     trend: "down", 
     icon: AlertCircle,
     description: "Pending payments",
@@ -25,8 +25,8 @@ const metrics = [
   },
   {
     title: "Total Clients",
-    value: "142",
-    change: "+8.1%",
+    value: "0",
+    change: "+0%",
     trend: "up",
     icon: Users,
     description: "Active clients",
@@ -34,8 +34,8 @@ const metrics = [
   },
   {
     title: "This Month",
-    value: "$45,250",
-    change: "+18.2%",
+    value: "₹0",
+    change: "+0%",
     trend: "up",
     icon: DollarSign,
     description: "Current revenue",
@@ -43,12 +43,7 @@ const metrics = [
   }
 ];
 
-const recentInvoices = [
-  { id: "INV-001", client: "Acme Corp", amount: "$2,500", status: "paid", dueDate: "2024-01-15" },
-  { id: "INV-002", client: "TechStart Inc", amount: "$1,750", status: "pending", dueDate: "2024-01-20" },
-  { id: "INV-003", client: "Digital Agency", amount: "$3,200", status: "overdue", dueDate: "2024-01-10" },
-  { id: "INV-004", client: "Creative Studio", amount: "$890", status: "draft", dueDate: "2024-01-25" },
-];
+const recentInvoices: any[] = [];
 
 const getStatusBadge = (status: string) => {
   const variants = {
@@ -145,27 +140,35 @@ export default function Dashboard() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {recentInvoices.map((invoice) => (
-                <div key={invoice.id} className="flex items-center justify-between p-3 border border-border/50 rounded-lg hover:bg-accent/50 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <FileText className="h-5 w-5 text-primary" />
+            {recentInvoices.length === 0 ? (
+              <div className="text-center py-12 text-muted-foreground">
+                <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p className="mb-2">No invoices yet</p>
+                <p className="text-sm">Create your first invoice to get started</p>
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {recentInvoices.map((invoice) => (
+                  <div key={invoice.id} className="flex items-center justify-between p-3 border border-border/50 rounded-lg hover:bg-accent/50 transition-colors">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <FileText className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-foreground">{invoice.client}</p>
+                        <p className="text-sm text-muted-foreground">{invoice.id}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium text-foreground">{invoice.client}</p>
-                      <p className="text-sm text-muted-foreground">{invoice.id}</p>
+                    <div className="text-right">
+                      <p className="font-semibold text-foreground">{invoice.amount}</p>
+                      <Badge className={getStatusBadge(invoice.status)}>
+                        {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
+                      </Badge>
                     </div>
                   </div>
-                  <div className="text-right">
-                    <p className="font-semibold text-foreground">{invoice.amount}</p>
-                    <Badge className={getStatusBadge(invoice.status)}>
-                      {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
-                    </Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
 

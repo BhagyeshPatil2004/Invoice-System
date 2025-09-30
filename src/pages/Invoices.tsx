@@ -20,54 +20,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-// Mock data for demonstration
-const invoices = [
-  {
-    id: "INV-001",
-    clientName: "Acme Corporation",
-    amount: 2500,
-    status: "paid",
-    issueDate: "2024-01-15",
-    dueDate: "2024-02-15",
-    description: "Web Development Services"
-  },
-  {
-    id: "INV-002", 
-    clientName: "TechStart Inc",
-    amount: 1750,
-    status: "pending",
-    issueDate: "2024-01-18",
-    dueDate: "2024-02-18",
-    description: "UI/UX Design Package"
-  },
-  {
-    id: "INV-003",
-    clientName: "Digital Agency Pro",
-    amount: 3200,
-    status: "overdue",
-    issueDate: "2024-01-05",
-    dueDate: "2024-01-20",
-    description: "SEO Optimization Services"
-  },
-  {
-    id: "INV-004",
-    clientName: "Creative Studio Ltd",
-    amount: 890,
-    status: "draft",
-    issueDate: "2024-01-20",
-    dueDate: "2024-02-20",
-    description: "Logo Design Project"
-  },
-  {
-    id: "INV-005",
-    clientName: "Startup Hub",
-    amount: 4500,
-    status: "sent",
-    issueDate: "2024-01-22",
-    dueDate: "2024-02-22",
-    description: "Full Stack Development"
-  }
-];
+// Empty initial state
+const invoices: any[] = [];
 
 const getStatusBadge = (status: string) => {
   const variants = {
@@ -135,7 +89,7 @@ export default function Invoices() {
         <Card className="hover:shadow-md transition-shadow">
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-foreground">
-              ${totalAmount.toLocaleString()}
+              ₹{totalAmount.toLocaleString()}
             </div>
             <p className="text-sm text-muted-foreground">Total Invoiced</p>
           </CardContent>
@@ -143,7 +97,7 @@ export default function Invoices() {
         <Card className="hover:shadow-md transition-shadow">
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-success">
-              ${paidAmount.toLocaleString()}
+              ₹{paidAmount.toLocaleString()}
             </div>
             <p className="text-sm text-muted-foreground">Paid</p>
           </CardContent>
@@ -151,7 +105,7 @@ export default function Invoices() {
         <Card className="hover:shadow-md transition-shadow">
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-warning">
-              ${pendingAmount.toLocaleString()}
+              ₹{pendingAmount.toLocaleString()}
             </div>
             <p className="text-sm text-muted-foreground">Pending</p>
           </CardContent>
@@ -219,11 +173,11 @@ export default function Invoices() {
                     <TableCell>
                       <div className="font-medium text-foreground">{invoice.clientName}</div>
                     </TableCell>
-                    <TableCell>
-                      <div className={`font-semibold ${getStatusColor(invoice.status)}`}>
-                        ${invoice.amount.toLocaleString()}
-                      </div>
-                    </TableCell>
+                     <TableCell>
+                       <div className={`font-semibold ${getStatusColor(invoice.status)}`}>
+                         ₹{invoice.amount.toLocaleString()}
+                       </div>
+                     </TableCell>
                     <TableCell>
                       <Badge className={getStatusBadge(invoice.status)}>
                         {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}

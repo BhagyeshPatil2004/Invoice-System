@@ -19,44 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const quotations = [
-  {
-    id: "QUO-001",
-    clientName: "Acme Corporation",
-    amount: 2500,
-    status: "sent",
-    issueDate: "2024-01-15",
-    validUntil: "2024-02-15",
-    description: "Web Development Services"
-  },
-  {
-    id: "QUO-002", 
-    clientName: "TechStart Inc",
-    amount: 1750,
-    status: "accepted",
-    issueDate: "2024-01-18",
-    validUntil: "2024-02-18",
-    description: "UI/UX Design Package"
-  },
-  {
-    id: "QUO-003",
-    clientName: "Digital Agency Pro",
-    amount: 3200,
-    status: "declined",
-    issueDate: "2024-01-05",
-    validUntil: "2024-02-05",
-    description: "SEO Optimization Services"
-  },
-  {
-    id: "QUO-004",
-    clientName: "Creative Studio Ltd",
-    amount: 890,
-    status: "draft",
-    issueDate: "2024-01-20",
-    validUntil: "2024-02-20",
-    description: "Logo Design Project"
-  }
-];
+const quotations: any[] = [];
 
 const getStatusBadge = (status: string) => {
   const variants = {
@@ -109,7 +72,7 @@ export default function Quotations() {
         <Card className="hover:shadow-md transition-shadow">
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-foreground">
-              ${totalAmount.toLocaleString()}
+              ₹{totalAmount.toLocaleString()}
             </div>
             <p className="text-sm text-muted-foreground">Total Quoted</p>
           </CardContent>
@@ -117,7 +80,7 @@ export default function Quotations() {
         <Card className="hover:shadow-md transition-shadow">
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-success">
-              ${acceptedAmount.toLocaleString()}
+              ₹{acceptedAmount.toLocaleString()}
             </div>
             <p className="text-sm text-muted-foreground">Accepted</p>
           </CardContent>
@@ -125,7 +88,7 @@ export default function Quotations() {
         <Card className="hover:shadow-md transition-shadow">
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-warning">
-              ${pendingAmount.toLocaleString()}
+              ₹{pendingAmount.toLocaleString()}
             </div>
             <p className="text-sm text-muted-foreground">Pending</p>
           </CardContent>
@@ -193,11 +156,11 @@ export default function Quotations() {
                     <TableCell>
                       <div className="font-medium text-foreground">{quote.clientName}</div>
                     </TableCell>
-                    <TableCell>
-                      <div className="font-semibold text-foreground">
-                        ${quote.amount.toLocaleString()}
-                      </div>
-                    </TableCell>
+                     <TableCell>
+                       <div className="font-semibold text-foreground">
+                         ₹{quote.amount.toLocaleString()}
+                       </div>
+                     </TableCell>
                     <TableCell>
                       <Badge className={getStatusBadge(quote.status)}>
                         {quote.status.charAt(0).toUpperCase() + quote.status.slice(1)}

@@ -54,10 +54,10 @@ export default function Reports() {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Revenue</p>
-                <div className="text-2xl font-bold text-foreground">$124,500</div>
+                <div className="text-2xl font-bold text-foreground">₹0</div>
               </div>
             </div>
-            <div className="text-sm text-success">+12.5% from last period</div>
+            <div className="text-sm text-success">+0% from last period</div>
           </CardContent>
         </Card>
 
@@ -69,10 +69,10 @@ export default function Reports() {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Invoices</p>
-                <div className="text-2xl font-bold text-foreground">156</div>
+                <div className="text-2xl font-bold text-foreground">0</div>
               </div>
             </div>
-            <div className="text-sm text-primary">+8 new this week</div>
+            <div className="text-sm text-primary">+0 new this week</div>
           </CardContent>
         </Card>
 
@@ -84,10 +84,10 @@ export default function Reports() {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Growth</p>
-                <div className="text-2xl font-bold text-foreground">18.2%</div>
+                <div className="text-2xl font-bold text-foreground">0%</div>
               </div>
             </div>
-            <div className="text-sm text-warning">Above target</div>
+            <div className="text-sm text-warning">No data</div>
           </CardContent>
         </Card>
 
@@ -99,10 +99,10 @@ export default function Reports() {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">Clients</p>
-                <div className="text-2xl font-bold text-foreground">142</div>
+                <div className="text-2xl font-bold text-foreground">0</div>
               </div>
             </div>
-            <div className="text-sm text-primary">+12 this month</div>
+            <div className="text-sm text-primary">+0 this month</div>
           </CardContent>
         </Card>
       </div>
@@ -136,20 +136,20 @@ export default function Reports() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-4 mt-6">
-                <div className="p-4 border border-border rounded-lg">
-                  <p className="text-sm text-muted-foreground mb-1">Total Sales</p>
-                  <p className="text-2xl font-bold text-foreground">$124,500</p>
-                </div>
-                <div className="p-4 border border-border rounded-lg">
-                  <p className="text-sm text-muted-foreground mb-1">Average Invoice</p>
-                  <p className="text-2xl font-bold text-foreground">$2,340</p>
-                </div>
-                <div className="p-4 border border-border rounded-lg">
-                  <p className="text-sm text-muted-foreground mb-1">Growth Rate</p>
-                  <p className="text-2xl font-bold text-success">+12.5%</p>
-                </div>
-              </div>
+               <div className="grid grid-cols-3 gap-4 mt-6">
+                 <div className="p-4 border border-border rounded-lg">
+                   <p className="text-sm text-muted-foreground mb-1">Total Sales</p>
+                   <p className="text-2xl font-bold text-foreground">₹0</p>
+                 </div>
+                 <div className="p-4 border border-border rounded-lg">
+                   <p className="text-sm text-muted-foreground mb-1">Average Invoice</p>
+                   <p className="text-2xl font-bold text-foreground">₹0</p>
+                 </div>
+                 <div className="p-4 border border-border rounded-lg">
+                   <p className="text-sm text-muted-foreground mb-1">Growth Rate</p>
+                   <p className="text-2xl font-bold text-success">+0%</p>
+                 </div>
+               </div>
             </CardContent>
           </Card>
         </TabsContent>

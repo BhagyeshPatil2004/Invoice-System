@@ -19,57 +19,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-// Mock data for demonstration
-const clients = [
-  {
-    id: 1,
-    name: "Acme Corporation",
-    email: "billing@acme.com",
-    phone: "+1 (555) 123-4567",
-    company: "Acme Corp",
-    totalInvoices: 12,
-    totalAmount: 25600,
-    outstanding: 4500,
-    status: "active",
-    lastInvoice: "2024-01-15"
-  },
-  {
-    id: 2,
-    name: "TechStart Inc",
-    email: "finance@techstart.io", 
-    phone: "+1 (555) 987-6543",
-    company: "TechStart Inc",
-    totalInvoices: 8,
-    totalAmount: 18900,
-    outstanding: 0,
-    status: "active",
-    lastInvoice: "2024-01-10"
-  },
-  {
-    id: 3,
-    name: "Digital Agency Pro",
-    email: "accounts@digitalagency.com",
-    phone: "+1 (555) 456-7890",
-    company: "Digital Agency",
-    totalInvoices: 15,
-    totalAmount: 42300,
-    outstanding: 8750,
-    status: "active",
-    lastInvoice: "2024-01-18"
-  },
-  {
-    id: 4,
-    name: "Creative Studio Ltd",
-    email: "billing@creative.studio",
-    phone: "+1 (555) 321-0987",
-    company: "Creative Studio",
-    totalInvoices: 5,
-    totalAmount: 12400,
-    outstanding: 0,
-    status: "inactive",
-    lastInvoice: "2023-12-20"
-  }
-];
+// Empty initial state
+const clients: any[] = [];
 
 const getStatusBadge = (status: string) => {
   return status === "active" 
@@ -167,18 +118,18 @@ export default function Clients() {
                         Last: {client.lastInvoice}
                       </div>
                     </TableCell>
-                    <TableCell>
-                      <div className="font-medium text-foreground">
-                        ${client.totalAmount.toLocaleString()}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className={`font-medium ${
-                        client.outstanding > 0 ? 'text-warning' : 'text-success'
-                      }`}>
-                        ${client.outstanding.toLocaleString()}
-                      </div>
-                    </TableCell>
+                     <TableCell>
+                       <div className="font-medium text-foreground">
+                         ₹{client.totalAmount.toLocaleString()}
+                       </div>
+                     </TableCell>
+                     <TableCell>
+                       <div className={`font-medium ${
+                         client.outstanding > 0 ? 'text-warning' : 'text-success'
+                       }`}>
+                         ₹{client.outstanding.toLocaleString()}
+                       </div>
+                     </TableCell>
                     <TableCell>
                       <Badge className={getStatusBadge(client.status)}>
                         {client.status.charAt(0).toUpperCase() + client.status.slice(1)}
@@ -226,23 +177,19 @@ export default function Clients() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card className="hover:shadow-md transition-shadow">
           <CardContent className="pt-6">
-            <div className="text-2xl font-bold text-foreground">{clients.length}</div>
+            <div className="text-2xl font-bold text-foreground">0</div>
             <p className="text-sm text-muted-foreground">Total Clients</p>
           </CardContent>
         </Card>
         <Card className="hover:shadow-md transition-shadow">
           <CardContent className="pt-6">
-            <div className="text-2xl font-bold text-success">
-              {clients.filter(c => c.status === 'active').length}
-            </div>
+            <div className="text-2xl font-bold text-success">0</div>
             <p className="text-sm text-muted-foreground">Active Clients</p>
           </CardContent>
         </Card>
         <Card className="hover:shadow-md transition-shadow">
           <CardContent className="pt-6">
-            <div className="text-2xl font-bold text-warning">
-              ${clients.reduce((sum, client) => sum + client.outstanding, 0).toLocaleString()}
-            </div>
+            <div className="text-2xl font-bold text-warning">₹0</div>
             <p className="text-sm text-muted-foreground">Total Outstanding</p>
           </CardContent>
         </Card>

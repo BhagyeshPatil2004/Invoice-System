@@ -19,48 +19,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-const receivables = [
-  {
-    id: "INV-001",
-    clientName: "Acme Corporation",
-    invoiceAmount: 2500,
-    amountPaid: 2500,
-    amountDue: 0,
-    status: "paid",
-    dueDate: "2024-01-15",
-    paidDate: "2024-01-14"
-  },
-  {
-    id: "INV-002", 
-    clientName: "TechStart Inc",
-    invoiceAmount: 1750,
-    amountPaid: 1000,
-    amountDue: 750,
-    status: "partial",
-    dueDate: "2024-02-20",
-    paidDate: "2024-01-20"
-  },
-  {
-    id: "INV-003",
-    clientName: "Digital Agency Pro",
-    invoiceAmount: 3200,
-    amountPaid: 0,
-    amountDue: 3200,
-    status: "overdue",
-    dueDate: "2024-01-10",
-    paidDate: null
-  },
-  {
-    id: "INV-005",
-    clientName: "Startup Hub",
-    invoiceAmount: 4500,
-    amountPaid: 0,
-    amountDue: 4500,
-    status: "pending",
-    dueDate: "2024-02-25",
-    paidDate: null
-  }
-];
+const receivables: any[] = [];
 
 const getStatusBadge = (status: string) => {
   const variants = {
@@ -107,7 +66,7 @@ export default function Receivables() {
         <Card className="hover:shadow-md transition-shadow">
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-foreground">
-              ${totalInvoiced.toLocaleString()}
+              ₹{totalInvoiced.toLocaleString()}
             </div>
             <p className="text-sm text-muted-foreground">Total Invoiced</p>
           </CardContent>
@@ -115,7 +74,7 @@ export default function Receivables() {
         <Card className="hover:shadow-md transition-shadow">
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-success">
-              ${totalReceived.toLocaleString()}
+              ₹{totalReceived.toLocaleString()}
             </div>
             <p className="text-sm text-muted-foreground">Received</p>
           </CardContent>
@@ -123,7 +82,7 @@ export default function Receivables() {
         <Card className="hover:shadow-md transition-shadow">
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-warning">
-              ${totalOutstanding.toLocaleString()}
+              ₹{totalOutstanding.toLocaleString()}
             </div>
             <p className="text-sm text-muted-foreground">Outstanding</p>
           </CardContent>
@@ -131,7 +90,7 @@ export default function Receivables() {
         <Card className="hover:shadow-md transition-shadow">
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-danger">
-              ${overdueAmount.toLocaleString()}
+              ₹{overdueAmount.toLocaleString()}
             </div>
             <p className="text-sm text-muted-foreground">Overdue</p>
           </CardContent>
@@ -185,21 +144,21 @@ export default function Receivables() {
                     <TableCell>
                       <div className="font-medium text-foreground">{item.clientName}</div>
                     </TableCell>
-                    <TableCell>
-                      <div className="font-semibold text-foreground">
-                        ${item.invoiceAmount.toLocaleString()}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="text-success font-medium">
-                        ${item.amountPaid.toLocaleString()}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className={`font-medium ${item.amountDue > 0 ? 'text-warning' : 'text-muted-foreground'}`}>
-                        ${item.amountDue.toLocaleString()}
-                      </div>
-                    </TableCell>
+                     <TableCell>
+                       <div className="font-semibold text-foreground">
+                         ₹{item.invoiceAmount.toLocaleString()}
+                       </div>
+                     </TableCell>
+                     <TableCell>
+                       <div className="text-success font-medium">
+                         ₹{item.amountPaid.toLocaleString()}
+                       </div>
+                     </TableCell>
+                     <TableCell>
+                       <div className={`font-medium ${item.amountDue > 0 ? 'text-warning' : 'text-muted-foreground'}`}>
+                         ₹{item.amountDue.toLocaleString()}
+                       </div>
+                     </TableCell>
                     <TableCell>
                       <Badge className={getStatusBadge(item.status)}>
                         {item.status.charAt(0).toUpperCase() + item.status.slice(1)}

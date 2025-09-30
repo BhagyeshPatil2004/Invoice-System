@@ -11,6 +11,7 @@ import Quotations from "./pages/Quotations";
 import Receivables from "./pages/Receivables";
 import Payables from "./pages/Payables";
 import Reports from "./pages/Reports";
+import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -22,6 +23,7 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
+          <Route path="/auth" element={<Auth />} />
           <Route path="/" element={
             <Layout>
               <Dashboard />
