@@ -187,29 +187,42 @@ export default function QuotationDialog({ open, onOpenChange, onQuotationCreate 
                     <Label>Tax Type</Label>
                     <Select
                       value={item.taxType}
-                      onValueChange={(value: 'none' | 'gst' | 'igst') => updateLineItem(index, 'taxType', value)}
+                      onValueChange={(value: 'none' | 'gst' | 'igst') => {
+                        updateLineItem(index, 'taxType', value);
+                        if (value === 'none') {
+                          updateLineItem(index, 'taxRate', 0);
+                        }
+                      }}
                     >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="none">None</SelectItem>
+                        <SelectItem value="none">No Tax</SelectItem>
                         <SelectItem value="gst">GST</SelectItem>
                         <SelectItem value="igst">IGST</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
-                  <div className="col-span-1">
-                    <Label>Tax %</Label>
-                    <Input
-                      type="number"
-                      value={item.taxRate}
-                      onChange={(e) => updateLineItem(index, 'taxRate', parseFloat(e.target.value))}
-                      min="0"
-                      max="100"
-                      disabled={item.taxType === 'none'}
-                    />
-                  </div>
+                  {item.taxType !== 'none' && (
+                    <div className="col-span-1">
+                      <Label>Tax Rate</Label>
+                      <Select
+                        value={item.taxRate.toString()}
+                        onValueChange={(value) => updateLineItem(index, 'taxRate', parseFloat(value))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="5">5%</SelectItem>
+                          <SelectItem value="12">12%</SelectItem>
+                          <SelectItem value="18">18%</SelectItem>
+                          <SelectItem value="28">28%</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
                   <div className="col-span-1 flex items-end">
                     <Button
                       type="button"

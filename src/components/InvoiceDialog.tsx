@@ -185,15 +185,13 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
           {/* Client Selection */}
           <div className="grid grid-cols-2 gap-4 animate-fade-in">
             <div className="space-y-2">
-              <Label htmlFor="client">Client *</Label>
-              <Select value={clientId} onValueChange={setClientId}>
-                <SelectTrigger id="client">
-                  <SelectValue placeholder="Select client" />
-                </SelectTrigger>
-                <SelectContent>
-                  {/* No clients available yet */}
-                </SelectContent>
-              </Select>
+              <Label htmlFor="client">Client Name *</Label>
+              <Input
+                id="client"
+                placeholder="Enter client name"
+                value={clientId}
+                onChange={(e) => setClientId(e.target.value)}
+              />
             </div>
 
             <div className="space-y-2">

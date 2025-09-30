@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Search, MoreHorizontal, Edit, Eye, Send, Download, FileText } from "lucide-react";
+import { Plus, Search, MoreHorizontal, Download, FileText, Trash2 } from "lucide-react";
 import InvoiceDialog from "@/components/InvoiceDialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -206,20 +206,12 @@ export default function Invoices() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
                           <DropdownMenuItem>
-                            <Eye className="h-4 w-4 mr-2" />
-                            View Invoice
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Edit className="h-4 w-4 mr-2" />
-                            Edit Invoice
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Send className="h-4 w-4 mr-2" />
-                            Send to Client
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
                             <Download className="h-4 w-4 mr-2" />
                             Download PDF
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="text-destructive">
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete Invoice
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Search, MoreHorizontal, Edit, Eye, Send, Download, FileText, CheckCircle, XCircle } from "lucide-react";
+import { Plus, Search, MoreHorizontal, Download, FileText, Trash2 } from "lucide-react";
 import QuotationDialog from "@/components/QuotationDialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -187,24 +187,12 @@ export default function Quotations() {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
                           <DropdownMenuItem>
-                            <Eye className="h-4 w-4 mr-2" />
-                            View Quotation
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Edit className="h-4 w-4 mr-2" />
-                            Edit Quotation
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Send className="h-4 w-4 mr-2" />
-                            Send to Client
-                          </DropdownMenuItem>
-                          <DropdownMenuItem className="text-success">
-                            <CheckCircle className="h-4 w-4 mr-2" />
-                            Convert to Invoice
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
                             <Download className="h-4 w-4 mr-2" />
                             Download PDF
+                          </DropdownMenuItem>
+                          <DropdownMenuItem className="text-destructive">
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete Quotation
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
