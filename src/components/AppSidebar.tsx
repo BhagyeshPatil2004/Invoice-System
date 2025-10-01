@@ -44,10 +44,10 @@ export function AppSidebar() {
 
   const isCollapsed = state === "collapsed";
   
-  // Active Sidebar Tab styling - matches reference design
+  // Active Menu Item styling - clear and prominent highlight
   const getNavClass = ({ isActive }: { isActive: boolean }) =>
     isActive 
-      ? "bg-sidebar-accent text-sidebar-foreground font-medium" 
+      ? "bg-primary/20 text-primary font-semibold border-l-4 border-primary pl-3" 
       : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground";
 
   return (
