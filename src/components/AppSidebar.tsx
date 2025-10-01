@@ -42,13 +42,12 @@ export function AppSidebar() {
   const location = useLocation();
   const currentPath = location.pathname;
 
-  const isActive = (path: string) => currentPath === path;
   const isCollapsed = state === "collapsed";
   
   const getNavClass = ({ isActive }: { isActive: boolean }) =>
     isActive 
-      ? "bg-sidebar-accent/80 text-sidebar-foreground font-medium border-l-2 border-primary" 
-      : "hover:bg-sidebar-accent/40 text-sidebar-foreground/80 hover:text-sidebar-foreground";
+      ? "bg-sidebar-accent text-sidebar-foreground font-semibold border-l-4 border-primary shadow-sm" 
+      : "hover:bg-sidebar-accent/40 text-sidebar-foreground/70 hover:text-sidebar-foreground";
 
   return (
     <Sidebar collapsible="icon">
