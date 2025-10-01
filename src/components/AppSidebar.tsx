@@ -44,11 +44,11 @@ export function AppSidebar() {
 
   const isCollapsed = state === "collapsed";
   
-  // Active Menu Item styling - clear and prominent highlight
+  // Active Menu Item styling - prominent and clear
   const getNavClass = ({ isActive }: { isActive: boolean }) =>
     isActive 
-      ? "bg-primary/20 text-primary font-semibold border-l-4 border-primary pl-3" 
-      : "text-sidebar-foreground/70 hover:bg-sidebar-accent/50 hover:text-sidebar-foreground";
+      ? "bg-[hsl(var(--sidebar-accent))] text-white font-semibold border-l-4 border-primary shadow-sm" 
+      : "text-sidebar-foreground/70 hover:bg-sidebar-accent/30 hover:text-sidebar-foreground transition-colors";
 
   return (
     <Sidebar collapsible="icon">
