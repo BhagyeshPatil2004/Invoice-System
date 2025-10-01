@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Search, MoreHorizontal, CheckCircle, Clock, AlertCircle, Upload } from "lucide-react";
+import { Plus, Search, MoreHorizontal, Download, Trash2, Edit } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,8 +18,18 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-const payables: any[] = [];
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
+import PayableDialog from "@/components/PayableDialog";
 
 const getStatusBadge = (status: string) => {
   const variants = {
@@ -34,12 +44,49 @@ const getStatusBadge = (status: string) => {
 
 export default function Payables() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [payables, setPayables] = useState<any[]>([]);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedPayable, setSelectedPayable] = useState<any>(null);
+  const { toast } = useToast();
   
   const filteredPayables = payables.filter(item => 
     item.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
     item.vendorName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     item.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleSave = (payable: any) => {
+    if (selectedPayable) {
+      setPayables(payables.map(p => p.id === selectedPayable.id ? payable : p));
+      toast({ title: "Bill updated successfully" });
+    } else {
+      setPayables([...payables, payable]);
+      toast({ title: "Bill added successfully" });
+    }
+    setSelectedPayable(null);
+  };
+
+  const handleEdit = (payable: any) => {
+    setSelectedPayable(payable);
+    setDialogOpen(true);
+  };
+
+  const handleDeleteClick = (payable: any) => {
+    setSelectedPayable(payable);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    setPayables(payables.filter(p => p.id !== selectedPayable.id));
+    toast({ title: "Bill deleted successfully" });
+    setDeleteDialogOpen(false);
+    setSelectedPayable(null);
+  };
+
+  const handleDownload = () => {
+    toast({ title: "Downloading bill..." });
+  };
 
   const totalBills = payables.reduce((sum, item) => sum + item.billAmount, 0);
   const totalPaid = payables.reduce((sum, item) => sum + item.amountPaid, 0);
@@ -56,16 +103,10 @@ export default function Payables() {
             Track payments you need to make to vendors
           </p>
         </div>
-        <div className="flex gap-3">
-          <Button variant="outline">
-            <Upload className="h-4 w-4 mr-2" />
-            Upload Bill
-          </Button>
-          <Button className="hover-scale">
-            <Plus className="h-4 w-4 mr-2" />
-            Add Bill
-          </Button>
-        </div>
+        <Button className="hover-scale" onClick={() => { setSelectedPayable(null); setDialogOpen(true); }}>
+          <Plus className="h-4 w-4 mr-2" />
+          Add Bill
+        </Button>
       </div>
 
       {/* Quick Stats */}
@@ -192,17 +233,17 @@ export default function Payables() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuItem>
-                            <CheckCircle className="h-4 w-4 mr-2" />
-                            Mark as Paid
+                          <DropdownMenuItem onClick={() => handleEdit(item)}>
+                            <Edit className="h-4 w-4 mr-2" />
+                            Edit
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Clock className="h-4 w-4 mr-2" />
-                            Set Reminder
+                          <DropdownMenuItem onClick={handleDownload}>
+                            <Download className="h-4 w-4 mr-2" />
+                            Download
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <AlertCircle className="h-4 w-4 mr-2" />
-                            View Details
+                          <DropdownMenuItem onClick={() => handleDeleteClick(item)} className="text-danger">
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -214,6 +255,28 @@ export default function Payables() {
           </div>
         </CardContent>
       </Card>
+
+      <PayableDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onSave={handleSave}
+        payable={selectedPayable}
+      />
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete this bill. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

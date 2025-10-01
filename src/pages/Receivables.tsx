@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Search, MoreHorizontal, CheckCircle, Clock, AlertCircle } from "lucide-react";
+import { Plus, Search, MoreHorizontal, Download, Trash2, Edit } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,8 +18,18 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-
-const receivables: any[] = [];
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
+import ReceivableDialog from "@/components/ReceivableDialog";
 
 const getStatusBadge = (status: string) => {
   const variants = {
@@ -34,11 +44,48 @@ const getStatusBadge = (status: string) => {
 
 export default function Receivables() {
   const [searchTerm, setSearchTerm] = useState("");
+  const [receivables, setReceivables] = useState<any[]>([]);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [selectedReceivable, setSelectedReceivable] = useState<any>(null);
+  const { toast } = useToast();
   
   const filteredReceivables = receivables.filter(item => 
     item.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
     item.clientName.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleSave = (receivable: any) => {
+    if (selectedReceivable) {
+      setReceivables(receivables.map(r => r.id === selectedReceivable.id ? receivable : r));
+      toast({ title: "Receivable updated successfully" });
+    } else {
+      setReceivables([...receivables, receivable]);
+      toast({ title: "Receivable added successfully" });
+    }
+    setSelectedReceivable(null);
+  };
+
+  const handleEdit = (receivable: any) => {
+    setSelectedReceivable(receivable);
+    setDialogOpen(true);
+  };
+
+  const handleDeleteClick = (receivable: any) => {
+    setSelectedReceivable(receivable);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    setReceivables(receivables.filter(r => r.id !== selectedReceivable.id));
+    toast({ title: "Receivable deleted successfully" });
+    setDeleteDialogOpen(false);
+    setSelectedReceivable(null);
+  };
+
+  const handleDownload = () => {
+    toast({ title: "Downloading receivable report..." });
+  };
 
   const totalInvoiced = receivables.reduce((sum, item) => sum + item.invoiceAmount, 0);
   const totalReceived = receivables.reduce((sum, item) => sum + item.amountPaid, 0);
@@ -55,9 +102,9 @@ export default function Receivables() {
             Track payments you need to receive from clients
           </p>
         </div>
-        <Button className="hover-scale">
+        <Button className="hover-scale" onClick={() => { setSelectedReceivable(null); setDialogOpen(true); }}>
           <Plus className="h-4 w-4 mr-2" />
-          Record Payment
+          Add Receivable
         </Button>
       </div>
 
@@ -181,17 +228,17 @@ export default function Receivables() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
-                          <DropdownMenuItem>
-                            <CheckCircle className="h-4 w-4 mr-2" />
-                            Record Payment
+                          <DropdownMenuItem onClick={() => handleEdit(item)}>
+                            <Edit className="h-4 w-4 mr-2" />
+                            Edit
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <Clock className="h-4 w-4 mr-2" />
-                            Send Reminder
+                          <DropdownMenuItem onClick={handleDownload}>
+                            <Download className="h-4 w-4 mr-2" />
+                            Download
                           </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            <AlertCircle className="h-4 w-4 mr-2" />
-                            View Details
+                          <DropdownMenuItem onClick={() => handleDeleteClick(item)} className="text-danger">
+                            <Trash2 className="h-4 w-4 mr-2" />
+                            Delete
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
@@ -203,6 +250,28 @@ export default function Receivables() {
           </div>
         </CardContent>
       </Card>
+
+      <ReceivableDialog
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        onSave={handleSave}
+        receivable={selectedReceivable}
+      />
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete this receivable. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteConfirm}>Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
