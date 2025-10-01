@@ -96,7 +96,7 @@ export function AppSidebar() {
               {financialMenuItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton asChild>
-                    <NavLink to={item.url} className={getNavClass}>
+                    <NavLink to={item.url} end className={getNavClass}>
                       <item.icon className="h-5 w-5 flex-shrink-0" />
                       {!isCollapsed && <span className="ml-3">{item.title}</span>}
                     </NavLink>
@@ -112,7 +112,7 @@ export function AppSidebar() {
             <SidebarMenu>
               <SidebarMenuItem>
                 <SidebarMenuButton asChild>
-                  <NavLink to="/settings" className={getNavClass}>
+                  <NavLink to="/settings" end className={getNavClass}>
                     <Settings className="h-5 w-5 flex-shrink-0" />
                     {!isCollapsed && <span className="ml-3">Settings</span>}
                   </NavLink>
