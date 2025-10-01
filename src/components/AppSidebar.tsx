@@ -47,8 +47,8 @@ export function AppSidebar() {
   
   const getNavClass = ({ isActive }: { isActive: boolean }) =>
     isActive 
-      ? "bg-primary text-primary-foreground font-semibold border-l-4 border-primary-hover shadow-md" 
-      : "hover:bg-sidebar-accent text-sidebar-foreground hover:text-sidebar-foreground";
+      ? "bg-sidebar-accent/80 text-sidebar-foreground font-medium border-l-2 border-primary" 
+      : "hover:bg-sidebar-accent/40 text-sidebar-foreground/80 hover:text-sidebar-foreground";
 
   return (
     <Sidebar collapsible="icon">
