@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { useTheme } from "next-themes";
-import { Moon, Sun, User, Mail, Building, Phone, Save } from "lucide-react";
+import { Moon, Sun, User, Mail, Building, Phone, Save, Edit, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
 
@@ -20,7 +20,22 @@ export default function Settings() {
     phone: "+1 (555) 123-4567",
   });
 
+  const [isEditing, setIsEditing] = useState(false);
+  const [tempDetails, setTempDetails] = useState(userDetails);
+
+  const handleEdit = () => {
+    setTempDetails(userDetails);
+    setIsEditing(true);
+  };
+
+  const handleCancel = () => {
+    setTempDetails(userDetails);
+    setIsEditing(false);
+  };
+
   const handleSave = () => {
+    setUserDetails(tempDetails);
+    setIsEditing(false);
     toast({
       title: "Settings saved",
       description: "Your settings have been updated successfully.",
@@ -76,41 +91,55 @@ export default function Settings() {
         {/* Profile Settings */}
         <Card className="shadow-lg hover:shadow-xl transition-shadow">
           <CardHeader>
-            <div className="flex items-center gap-3">
-              <User className="h-5 w-5 text-primary" />
-              <div>
-                <CardTitle>Profile Information</CardTitle>
-                <CardDescription>Update your personal details</CardDescription>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <User className="h-5 w-5 text-primary" />
+                <div>
+                  <CardTitle>Profile Information</CardTitle>
+                  <CardDescription>Update your personal details</CardDescription>
+                </div>
               </div>
+              {!isEditing && (
+                <Button onClick={handleEdit} variant="outline" size="sm" className="gap-2">
+                  <Edit className="h-4 w-4" />
+                  Edit
+                </Button>
+              )}
             </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="name" className="flex items-center gap-2">
+                <Label className="flex items-center gap-2">
                   <User className="h-4 w-4 text-muted-foreground" />
                   Full Name
                 </Label>
-                <Input
-                  id="name"
-                  value={userDetails.name}
-                  onChange={(e) => setUserDetails({ ...userDetails, name: e.target.value })}
-                  className="bg-background"
-                />
+                {isEditing ? (
+                  <Input
+                    value={tempDetails.name}
+                    onChange={(e) => setTempDetails({ ...tempDetails, name: e.target.value })}
+                    className="bg-background"
+                  />
+                ) : (
+                  <p className="text-sm font-medium p-2 rounded-md bg-muted">{userDetails.name}</p>
+                )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="email" className="flex items-center gap-2">
+                <Label className="flex items-center gap-2">
                   <Mail className="h-4 w-4 text-muted-foreground" />
                   Email Address
                 </Label>
-                <Input
-                  id="email"
-                  type="email"
-                  value={userDetails.email}
-                  onChange={(e) => setUserDetails({ ...userDetails, email: e.target.value })}
-                  className="bg-background"
-                />
+                {isEditing ? (
+                  <Input
+                    type="email"
+                    value={tempDetails.email}
+                    onChange={(e) => setTempDetails({ ...tempDetails, email: e.target.value })}
+                    className="bg-background"
+                  />
+                ) : (
+                  <p className="text-sm font-medium p-2 rounded-md bg-muted">{userDetails.email}</p>
+                )}
               </div>
             </div>
           </CardContent>
@@ -130,41 +159,54 @@ export default function Settings() {
           <CardContent>
             <div className="grid gap-6 md:grid-cols-2">
               <div className="space-y-2">
-                <Label htmlFor="company" className="flex items-center gap-2">
+                <Label className="flex items-center gap-2">
                   <Building className="h-4 w-4 text-muted-foreground" />
                   Company Name
                 </Label>
-                <Input
-                  id="company"
-                  value={userDetails.company}
-                  onChange={(e) => setUserDetails({ ...userDetails, company: e.target.value })}
-                  className="bg-background"
-                />
+                {isEditing ? (
+                  <Input
+                    value={tempDetails.company}
+                    onChange={(e) => setTempDetails({ ...tempDetails, company: e.target.value })}
+                    className="bg-background"
+                  />
+                ) : (
+                  <p className="text-sm font-medium p-2 rounded-md bg-muted">{userDetails.company}</p>
+                )}
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="phone" className="flex items-center gap-2">
+                <Label className="flex items-center gap-2">
                   <Phone className="h-4 w-4 text-muted-foreground" />
                   Phone Number
                 </Label>
-                <Input
-                  id="phone"
-                  type="tel"
-                  value={userDetails.phone}
-                  onChange={(e) => setUserDetails({ ...userDetails, phone: e.target.value })}
-                  className="bg-background"
-                />
+                {isEditing ? (
+                  <Input
+                    type="tel"
+                    value={tempDetails.phone}
+                    onChange={(e) => setTempDetails({ ...tempDetails, phone: e.target.value })}
+                    className="bg-background"
+                  />
+                ) : (
+                  <p className="text-sm font-medium p-2 rounded-md bg-muted">{userDetails.phone}</p>
+                )}
               </div>
             </div>
 
-            <Separator className="my-6" />
-
-            <div className="flex justify-end">
-              <Button onClick={handleSave} className="gap-2">
-                <Save className="h-4 w-4" />
-                Save Changes
-              </Button>
-            </div>
+            {isEditing && (
+              <>
+                <Separator className="my-6" />
+                <div className="flex justify-end gap-2">
+                  <Button onClick={handleCancel} variant="outline" className="gap-2">
+                    <X className="h-4 w-4" />
+                    Cancel
+                  </Button>
+                  <Button onClick={handleSave} className="gap-2">
+                    <Save className="h-4 w-4" />
+                    Save Changes
+                  </Button>
+                </div>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
