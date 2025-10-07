@@ -8,8 +8,7 @@ import {
   DollarSign, 
   Settings,
   TrendingUp,
-  Calendar,
-  User
+  Calendar
 } from "lucide-react";
 
 import {
@@ -53,19 +52,19 @@ export function AppSidebar() {
 
   return (
     <Sidebar collapsible="icon">
-      <NavLink to="/settings" className="block p-4 border-b border-sidebar-border hover:bg-sidebar-accent/50 transition-colors cursor-pointer">
+      <div className="p-4 border-b border-sidebar-border">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-            <User className="h-5 w-5 text-primary-foreground" />
+            <Receipt className="h-5 w-5 text-primary-foreground" />
           </div>
           {!isCollapsed && (
             <div>
-              <h2 className="font-bold text-sidebar-foreground">John Doe</h2>
-              <p className="text-xs text-sidebar-foreground/70">View Profile</p>
+              <h2 className="font-bold text-sidebar-foreground">InvoicePro</h2>
+              <p className="text-xs text-sidebar-foreground/70">Financial Management</p>
             </div>
           )}
         </div>
-      </NavLink>
+      </div>
 
       <SidebarContent>
         <SidebarGroup>
