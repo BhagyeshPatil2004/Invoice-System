@@ -124,30 +124,55 @@ export default function Invoices() {
         </div>
       </div>
 
+      {/* Payment Status Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Payment Status</CardTitle>
+          <CardDescription>Overview of paid and pending invoice amounts</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-foreground">Paid</h3>
+                <Badge className="bg-success/10 text-success border-success/20">
+                  {invoices.filter(i => i.status === 'paid').length} Invoices
+                </Badge>
+              </div>
+              <div className="text-3xl font-bold text-success">
+                ₹{paidAmount.toLocaleString()}
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Total amount received from paid invoices
+              </p>
+            </div>
+            
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-lg font-semibold text-foreground">Pending</h3>
+                <Badge className="bg-warning/10 text-warning border-warning/20">
+                  {invoices.filter(i => i.status === 'pending' || i.status === 'sent').length} Invoices
+                </Badge>
+              </div>
+              <div className="text-3xl font-bold text-warning">
+                ₹{pendingAmount.toLocaleString()}
+              </div>
+              <p className="text-sm text-muted-foreground">
+                Total amount awaiting payment
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card className="hover:shadow-md transition-shadow">
           <CardContent className="pt-6">
             <div className="text-2xl font-bold text-foreground">
               ₹{totalAmount.toLocaleString()}
             </div>
             <p className="text-sm text-muted-foreground">Total Invoiced</p>
-          </CardContent>
-        </Card>
-        <Card className="hover:shadow-md transition-shadow">
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold text-success">
-              ₹{paidAmount.toLocaleString()}
-            </div>
-            <p className="text-sm text-muted-foreground">Paid</p>
-          </CardContent>
-        </Card>
-        <Card className="hover:shadow-md transition-shadow">
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold text-warning">
-              ₹{pendingAmount.toLocaleString()}
-            </div>
-            <p className="text-sm text-muted-foreground">Pending</p>
           </CardContent>
         </Card>
         <Card className="hover:shadow-md transition-shadow">
