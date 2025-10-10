@@ -45,7 +45,6 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
   const [invoiceNumber, setInvoiceNumber] = useState(`INV-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`);
   const [issueDate, setIssueDate] = useState(new Date().toISOString().split('T')[0]);
   const [dueDate, setDueDate] = useState("");
-  const [status, setStatus] = useState<"draft" | "pending" | "paid" | "sent">("pending");
   const [notes, setNotes] = useState("");
   const [lineItems, setLineItems] = useState<LineItem[]>([
     { id: "1", description: "", quantity: 1, rate: 0, taxType: 'none', taxRate: 0 }
@@ -112,7 +111,6 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
     setInvoiceNumber(`INV-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`);
     setIssueDate(new Date().toISOString().split('T')[0]);
     setDueDate("");
-    setStatus("pending");
     setNotes("");
     setLineItems([{ id: "1", description: "", quantity: 1, rate: 0, taxType: 'none', taxRate: 0 }]);
   };
@@ -155,7 +153,7 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
       clientName: clientId,
       description: lineItems[0]?.description || "Invoice",
       amount: calculateGrandTotal(),
-      status: status,
+      status: "pending",
       issueDate,
       dueDate,
       notes,
@@ -207,8 +205,8 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
             </div>
           </div>
 
-          {/* Dates and Status */}
-          <div className="grid grid-cols-3 gap-4">
+          {/* Dates */}
+          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="issueDate">Issue Date</Label>
               <Input
@@ -227,21 +225,6 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
                 value={dueDate}
                 onChange={(e) => setDueDate(e.target.value)}
               />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="status">Status *</Label>
-              <Select value={status} onValueChange={(value: any) => setStatus(value)}>
-                <SelectTrigger id="status">
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="paid">Paid</SelectItem>
-                  <SelectItem value="sent">Sent</SelectItem>
-                  <SelectItem value="draft">Draft</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
           </div>
 

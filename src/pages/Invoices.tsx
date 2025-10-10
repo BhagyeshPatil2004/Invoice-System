@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Search, MoreHorizontal, Download, FileText, Trash2 } from "lucide-react";
+import { Plus, Search, MoreHorizontal, Download, FileText, Trash2, Edit } from "lucide-react";
 import InvoiceDialog from "@/components/InvoiceDialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -60,7 +67,9 @@ export default function Invoices() {
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [statusDialogOpen, setStatusDialogOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
+  const [newStatus, setNewStatus] = useState<string>("");
   const { toast } = useToast();
 
   const handleInvoiceCreate = (newInvoice: any) => {
@@ -89,6 +98,26 @@ export default function Invoices() {
       title: "Download Started",
       description: `Downloading invoice ${invoice.id}`,
     });
+  };
+
+  const handleStatusClick = (invoice: any) => {
+    setSelectedInvoice(invoice);
+    setNewStatus(invoice.status);
+    setStatusDialogOpen(true);
+  };
+
+  const handleStatusUpdate = () => {
+    if (selectedInvoice) {
+      setInvoices(invoices.map(inv => 
+        inv.id === selectedInvoice.id ? { ...inv, status: newStatus } : inv
+      ));
+      toast({
+        title: "Status Updated",
+        description: `Invoice status changed to ${newStatus}`,
+      });
+      setStatusDialogOpen(false);
+      setSelectedInvoice(null);
+    }
   };
   
   const filteredInvoices = invoices.filter(invoice => 
@@ -268,6 +297,10 @@ export default function Invoices() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuItem onClick={() => handleStatusClick(invoice)}>
+                            <Edit className="h-4 w-4 mr-2" />
+                            Change Status
+                          </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleDownload(invoice)}>
                             <Download className="h-4 w-4 mr-2" />
                             Download PDF
@@ -296,6 +329,38 @@ export default function Invoices() {
           )}
         </CardContent>
       </Card>
+
+      {/* Status Update Dialog */}
+      <AlertDialog open={statusDialogOpen} onOpenChange={setStatusDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Update Invoice Status</AlertDialogTitle>
+            <AlertDialogDescription>
+              Change the status for invoice {selectedInvoice?.id}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4">
+            <Select value={newStatus} onValueChange={setNewStatus}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="paid">Paid</SelectItem>
+                <SelectItem value="sent">Sent</SelectItem>
+                <SelectItem value="draft">Draft</SelectItem>
+                <SelectItem value="overdue">Overdue</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleStatusUpdate}>
+              Update Status
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
