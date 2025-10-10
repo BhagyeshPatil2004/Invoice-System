@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Plus, Search, MoreHorizontal, Download, FileText, Trash2 } from "lucide-react";
+import { Plus, Search, MoreHorizontal, Download, FileText, Trash2, Edit } from "lucide-react";
 import QuotationDialog from "@/components/QuotationDialog";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -44,10 +51,13 @@ const getStatusBadge = (status: string) => {
 
 export default function Quotations() {
   const [quotations, setQuotations] = useState<any[]>([]);
+  const [invoices, setInvoices] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [statusDialogOpen, setStatusDialogOpen] = useState(false);
   const [selectedQuotation, setSelectedQuotation] = useState<any>(null);
+  const [newStatus, setNewStatus] = useState<string>("");
   const { toast } = useToast();
 
   const handleQuotationCreate = (newQuotation: any) => {
@@ -76,6 +86,49 @@ export default function Quotations() {
       title: "Download Started",
       description: `Downloading quotation ${quotation.id}`,
     });
+  };
+
+  const handleStatusClick = (quotation: any) => {
+    setSelectedQuotation(quotation);
+    setNewStatus(quotation.status);
+    setStatusDialogOpen(true);
+  };
+
+  const handleStatusUpdate = () => {
+    if (selectedQuotation && newStatus) {
+      // Update quotation status
+      setQuotations(quotations.map(q => 
+        q.id === selectedQuotation.id ? { ...q, status: newStatus } : q
+      ));
+
+      // If status changed to "accepted", create an invoice
+      if (newStatus === 'accepted') {
+        const newInvoice = {
+          id: `INV-${Date.now()}`,
+          clientName: selectedQuotation.clientName,
+          description: selectedQuotation.description,
+          amount: selectedQuotation.amount,
+          status: 'pending',
+          issueDate: new Date().toISOString().split('T')[0],
+          dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days from now
+        };
+        
+        setInvoices([...invoices, newInvoice]);
+        
+        toast({
+          title: "Quotation Accepted & Invoice Created",
+          description: `Invoice ${newInvoice.id} has been created from this quotation`,
+        });
+      } else {
+        toast({
+          title: "Status Updated",
+          description: `Quotation status changed to ${newStatus}`,
+        });
+      }
+      
+      setStatusDialogOpen(false);
+      setSelectedQuotation(null);
+    }
   };
   
   const filteredQuotations = quotations.filter(quote => 
@@ -224,6 +277,10 @@ export default function Quotations() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuItem onClick={() => handleStatusClick(quote)}>
+                            <Edit className="h-4 w-4 mr-2" />
+                            Change Status
+                          </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleDownload(quote)}>
                             <Download className="h-4 w-4 mr-2" />
                             Download PDF
@@ -252,6 +309,42 @@ export default function Quotations() {
           )}
         </CardContent>
       </Card>
+
+      {/* Status Update Dialog */}
+      <AlertDialog open={statusDialogOpen} onOpenChange={setStatusDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Update Quotation Status</AlertDialogTitle>
+            <AlertDialogDescription>
+              Change the status for quotation {selectedQuotation?.id}
+              {newStatus === 'accepted' && (
+                <span className="block mt-2 text-success font-medium">
+                  Note: Accepting this quotation will automatically create an invoice.
+                </span>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4">
+            <Select value={newStatus} onValueChange={setNewStatus}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="draft">Draft</SelectItem>
+                <SelectItem value="sent">Sent</SelectItem>
+                <SelectItem value="accepted">Accepted</SelectItem>
+                <SelectItem value="declined">Declined</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleStatusUpdate}>
+              Update Status
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
