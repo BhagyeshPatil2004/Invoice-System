@@ -126,49 +126,6 @@ export default function Dashboard() {
         })}
       </div>
 
-      {/* Recent Activity */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <FileText className="h-5 w-5" />
-            Recent Invoices
-          </CardTitle>
-          <CardDescription>
-            Latest invoice activity and status updates
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          {recentInvoices.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p className="mb-2">No invoices yet</p>
-              <p className="text-sm">Create your first invoice to get started</p>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {recentInvoices.map((invoice) => (
-                <div key={invoice.id} className="flex items-center justify-between p-3 border border-border/50 rounded-lg hover:bg-accent/50 transition-colors">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <FileText className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-foreground">{invoice.client}</p>
-                      <p className="text-sm text-muted-foreground">{invoice.id}</p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-semibold text-foreground">{invoice.amount}</p>
-                    <Badge className={getStatusBadge(invoice.status)}>
-                      {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
-                    </Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
     </div>
   );
 }
