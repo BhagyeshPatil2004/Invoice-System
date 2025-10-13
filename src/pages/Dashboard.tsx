@@ -1,4 +1,4 @@
-import { TrendingUp, DollarSign, Users, AlertCircle, FileText, Clock } from "lucide-react";
+import { TrendingUp, DollarSign, Users, AlertCircle, FileText } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -126,93 +126,49 @@ export default function Dashboard() {
         })}
       </div>
 
-      {/* Recent Activity & Quick Stats */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Recent Invoices */}
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              Recent Invoices
-            </CardTitle>
-            <CardDescription>
-              Latest invoice activity and status updates
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {recentInvoices.length === 0 ? (
-              <div className="text-center py-12 text-muted-foreground">
-                <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p className="mb-2">No invoices yet</p>
-                <p className="text-sm">Create your first invoice to get started</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {recentInvoices.map((invoice) => (
-                  <div key={invoice.id} className="flex items-center justify-between p-3 border border-border/50 rounded-lg hover:bg-accent/50 transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                        <FileText className="h-5 w-5 text-primary" />
-                      </div>
-                      <div>
-                        <p className="font-medium text-foreground">{invoice.client}</p>
-                        <p className="text-sm text-muted-foreground">{invoice.id}</p>
-                      </div>
+      {/* Recent Activity */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5" />
+            Recent Invoices
+          </CardTitle>
+          <CardDescription>
+            Latest invoice activity and status updates
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {recentInvoices.length === 0 ? (
+            <div className="text-center py-12 text-muted-foreground">
+              <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+              <p className="mb-2">No invoices yet</p>
+              <p className="text-sm">Create your first invoice to get started</p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {recentInvoices.map((invoice) => (
+                <div key={invoice.id} className="flex items-center justify-between p-3 border border-border/50 rounded-lg hover:bg-accent/50 transition-colors">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <FileText className="h-5 w-5 text-primary" />
                     </div>
-                    <div className="text-right">
-                      <p className="font-semibold text-foreground">{invoice.amount}</p>
-                      <Badge className={getStatusBadge(invoice.status)}>
-                        {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
-                      </Badge>
+                    <div>
+                      <p className="font-medium text-foreground">{invoice.client}</p>
+                      <p className="text-sm text-muted-foreground">{invoice.id}</p>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Quick Actions */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Clock className="h-5 w-5" />
-              Quick Actions
-            </CardTitle>
-            <CardDescription>
-              Frequently used features
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <Button className="w-full justify-start" variant="outline" asChild>
-                <a href="/invoices">
-                  <FileText className="h-4 w-4 mr-2" />
-                  Create Invoice
-                </a>
-              </Button>
-              <Button className="w-full justify-start" variant="outline" asChild>
-                <a href="/clients">
-                  <Users className="h-4 w-4 mr-2" />
-                  Add New Client
-                </a>
-              </Button>
-              <Button className="w-full justify-start" variant="outline" asChild>
-                <a href="/reports">
-                  <TrendingUp className="h-4 w-4 mr-2" />
-                  View Reports
-                </a>
-              </Button>
-              <Button className="w-full justify-start" variant="outline" asChild>
-                <a href="/receivables">
-                  <DollarSign className="h-4 w-4 mr-2" />
-                  Record Payment
-                </a>
-              </Button>
+                  <div className="text-right">
+                    <p className="font-semibold text-foreground">{invoice.amount}</p>
+                    <Badge className={getStatusBadge(invoice.status)}>
+                      {invoice.status.charAt(0).toUpperCase() + invoice.status.slice(1)}
+                    </Badge>
+                  </div>
+                </div>
+              ))}
             </div>
-          </CardContent>
-        </Card>
-      </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
