@@ -8,7 +8,8 @@ import {
   DollarSign, 
   Settings,
   TrendingUp,
-  Calendar
+  Calendar,
+  Bell
 } from "lucide-react";
 
 import {
@@ -122,6 +123,22 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
+
+      {/* Notifications Section at Bottom */}
+      <div className="mt-auto p-4 border-t border-sidebar-border">
+        <div className="flex items-center gap-3">
+          <div className="relative">
+            <Bell className="h-5 w-5 text-sidebar-foreground" />
+            <span className="absolute -top-1 -right-1 h-3 w-3 bg-danger rounded-full"></span>
+          </div>
+          {!isCollapsed && (
+            <div className="flex-1">
+              <p className="text-sm font-medium text-sidebar-foreground">Notifications</p>
+              <p className="text-xs text-sidebar-foreground/70">3 new updates</p>
+            </div>
+          )}
+        </div>
+      </div>
     </Sidebar>
   );
 }
