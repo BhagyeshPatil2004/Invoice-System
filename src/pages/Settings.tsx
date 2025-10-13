@@ -3,14 +3,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Switch } from "@/components/ui/switch";
-import { useTheme } from "next-themes";
-import { Moon, Sun, User, Mail, Building, Phone, Save, Edit, X } from "lucide-react";
+import { User, Mail, Building, Phone, Save, Edit, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
 
 export default function Settings() {
-  const { theme, setTheme } = useTheme();
   const { toast } = useToast();
   
   const [userDetails, setUserDetails] = useState({
@@ -42,9 +39,6 @@ export default function Settings() {
     });
   };
 
-  const handleThemeToggle = (checked: boolean) => {
-    setTheme(checked ? "dark" : "light");
-  };
 
   return (
     <div className="space-y-6">
@@ -54,40 +48,6 @@ export default function Settings() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
-        {/* Theme Settings */}
-        <Card className="shadow-lg hover:shadow-xl transition-shadow">
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              {theme === "dark" ? (
-                <Moon className="h-5 w-5 text-primary" />
-              ) : (
-                <Sun className="h-5 w-5 text-primary" />
-              )}
-              <div>
-                <CardTitle>Appearance</CardTitle>
-                <CardDescription>Customize your interface theme</CardDescription>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center justify-between p-4 rounded-lg bg-accent/50">
-              <div className="space-y-1">
-                <Label htmlFor="theme-toggle" className="text-base font-medium">
-                  Dark Mode
-                </Label>
-                <p className="text-sm text-muted-foreground">
-                  {theme === "dark" ? "Currently using dark theme" : "Currently using light theme"}
-                </p>
-              </div>
-              <Switch
-                id="theme-toggle"
-                checked={theme === "dark"}
-                onCheckedChange={handleThemeToggle}
-              />
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Profile Settings */}
         <Card className="shadow-lg hover:shadow-xl transition-shadow">
           <CardHeader>
