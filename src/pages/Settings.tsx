@@ -47,79 +47,74 @@ export default function Settings() {
         <p className="text-muted-foreground mt-2">Manage your account settings and preferences</p>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Profile Settings */}
-        <Card className="shadow-lg hover:shadow-xl transition-shadow">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <User className="h-5 w-5 text-primary" />
-                <div>
-                  <CardTitle>Profile Information</CardTitle>
-                  <CardDescription>Update your personal details</CardDescription>
-                </div>
+      <Card className="shadow-lg hover:shadow-xl transition-shadow">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <User className="h-6 w-6 text-primary" />
+              <div>
+                <CardTitle className="text-2xl">Profile Information</CardTitle>
+                <CardDescription>Update your personal details</CardDescription>
               </div>
-              {!isEditing && (
-                <Button onClick={handleEdit} variant="outline" size="sm" className="gap-2">
-                  <Edit className="h-4 w-4" />
-                  Edit
-                </Button>
+            </div>
+            {!isEditing && (
+              <Button onClick={handleEdit} variant="outline" size="sm" className="gap-2">
+                <Edit className="h-4 w-4" />
+                Edit
+              </Button>
+            )}
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div className="grid gap-6 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2 text-base">
+                <User className="h-4 w-4 text-muted-foreground" />
+                Full Name
+              </Label>
+              {isEditing ? (
+                <Input
+                  value={tempDetails.name}
+                  onChange={(e) => setTempDetails({ ...tempDetails, name: e.target.value })}
+                  className="bg-background"
+                />
+              ) : (
+                <p className="text-sm font-medium p-3 rounded-md bg-card border">{userDetails.name}</p>
               )}
             </div>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label className="flex items-center gap-2">
-                  <User className="h-4 w-4 text-muted-foreground" />
-                  Full Name
-                </Label>
-                {isEditing ? (
-                  <Input
-                    value={tempDetails.name}
-                    onChange={(e) => setTempDetails({ ...tempDetails, name: e.target.value })}
-                    className="bg-background"
-                  />
-                ) : (
-                  <p className="text-sm font-medium p-2 rounded-md bg-muted">{userDetails.name}</p>
-                )}
-              </div>
 
-              <div className="space-y-2">
-                <Label className="flex items-center gap-2">
-                  <Mail className="h-4 w-4 text-muted-foreground" />
-                  Email Address
-                </Label>
-                {isEditing ? (
-                  <Input
-                    type="email"
-                    value={tempDetails.email}
-                    onChange={(e) => setTempDetails({ ...tempDetails, email: e.target.value })}
-                    className="bg-background"
-                  />
-                ) : (
-                  <p className="text-sm font-medium p-2 rounded-md bg-muted">{userDetails.email}</p>
-                )}
-              </div>
+            <div className="space-y-2">
+              <Label className="flex items-center gap-2 text-base">
+                <Mail className="h-4 w-4 text-muted-foreground" />
+                Email Address
+              </Label>
+              {isEditing ? (
+                <Input
+                  type="email"
+                  value={tempDetails.email}
+                  onChange={(e) => setTempDetails({ ...tempDetails, email: e.target.value })}
+                  className="bg-background"
+                />
+              ) : (
+                <p className="text-sm font-medium p-3 rounded-md bg-card border">{userDetails.email}</p>
+              )}
             </div>
-          </CardContent>
-        </Card>
+          </div>
 
-        {/* Business Settings */}
-        <Card className="shadow-lg hover:shadow-xl transition-shadow md:col-span-2">
-          <CardHeader>
-            <div className="flex items-center gap-3">
-              <Building className="h-5 w-5 text-primary" />
+          <Separator />
+
+          <div>
+            <div className="flex items-center gap-3 mb-4">
+              <Building className="h-6 w-6 text-primary" />
               <div>
-                <CardTitle>Business Information</CardTitle>
-                <CardDescription>Manage your company details</CardDescription>
+                <h3 className="text-xl font-semibold">Business Information</h3>
+                <p className="text-sm text-muted-foreground">Manage your company details</p>
               </div>
             </div>
-          </CardHeader>
-          <CardContent>
+
             <div className="grid gap-6 md:grid-cols-2">
               <div className="space-y-2">
-                <Label className="flex items-center gap-2">
+                <Label className="flex items-center gap-2 text-base">
                   <Building className="h-4 w-4 text-muted-foreground" />
                   Company Name
                 </Label>
@@ -130,12 +125,12 @@ export default function Settings() {
                     className="bg-background"
                   />
                 ) : (
-                  <p className="text-sm font-medium p-2 rounded-md bg-muted">{userDetails.company}</p>
+                  <p className="text-sm font-medium p-3 rounded-md bg-card border">{userDetails.company}</p>
                 )}
               </div>
 
               <div className="space-y-2">
-                <Label className="flex items-center gap-2">
+                <Label className="flex items-center gap-2 text-base">
                   <Phone className="h-4 w-4 text-muted-foreground" />
                   Phone Number
                 </Label>
@@ -147,29 +142,29 @@ export default function Settings() {
                     className="bg-background"
                   />
                 ) : (
-                  <p className="text-sm font-medium p-2 rounded-md bg-muted">{userDetails.phone}</p>
+                  <p className="text-sm font-medium p-3 rounded-md bg-card border">{userDetails.phone}</p>
                 )}
               </div>
             </div>
+          </div>
 
-            {isEditing && (
-              <>
-                <Separator className="my-6" />
-                <div className="flex justify-end gap-2">
-                  <Button onClick={handleCancel} variant="outline" className="gap-2">
-                    <X className="h-4 w-4" />
-                    Cancel
-                  </Button>
-                  <Button onClick={handleSave} className="gap-2">
-                    <Save className="h-4 w-4" />
-                    Save Changes
-                  </Button>
-                </div>
-              </>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+          {isEditing && (
+            <>
+              <Separator />
+              <div className="flex justify-end gap-2">
+                <Button onClick={handleCancel} variant="outline" className="gap-2">
+                  <X className="h-4 w-4" />
+                  Cancel
+                </Button>
+                <Button onClick={handleSave} className="gap-2">
+                  <Save className="h-4 w-4" />
+                  Save Changes
+                </Button>
+              </div>
+            </>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
