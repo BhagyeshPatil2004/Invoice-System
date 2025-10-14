@@ -117,7 +117,7 @@ export default function Clients() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-4 mb-6">
+          <div className="flex gap-4 mb-6 items-center">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input 
@@ -127,9 +127,9 @@ export default function Clients() {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <Button variant="outline">
-              Filter
-            </Button>
+            <div className="text-sm text-muted-foreground">
+              Total Clients: <span className="font-semibold text-foreground">{clients.length}</span>
+            </div>
           </div>
 
           {/* Clients Table */}
@@ -211,27 +211,6 @@ export default function Clients() {
         </CardContent>
       </Card>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <Card className="hover:shadow-md transition-shadow">
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold text-foreground">0</div>
-            <p className="text-sm text-muted-foreground">Total Clients</p>
-          </CardContent>
-        </Card>
-        <Card className="hover:shadow-md transition-shadow">
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold text-success">0</div>
-            <p className="text-sm text-muted-foreground">Active Clients</p>
-          </CardContent>
-        </Card>
-        <Card className="hover:shadow-md transition-shadow">
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold text-warning">₹0</div>
-            <p className="text-sm text-muted-foreground">Total Outstanding</p>
-          </CardContent>
-        </Card>
-      </div>
 
       {/* View Details Dialog */}
       <AlertDialog open={viewDetailsOpen} onOpenChange={setViewDetailsOpen}>
