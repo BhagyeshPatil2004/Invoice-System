@@ -1,14 +1,10 @@
 import { useState } from "react";
 import { useLocation, NavLink } from "react-router-dom";
-import { LayoutDashboard, Users, FileText, Receipt, DollarSign, Settings, TrendingUp, Calendar, Bell } from "lucide-react";
+import { Users, FileText, Receipt, DollarSign, Settings, TrendingUp, Calendar, Bell } from "lucide-react";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 const mainMenuItems = [{
-  title: "Dashboard",
-  url: "/",
-  icon: LayoutDashboard
-}, {
   title: "Clients",
-  url: "/clients",
+  url: "/",
   icon: Users
 }, {
   title: "Invoices",

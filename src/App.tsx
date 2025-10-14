@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import Layout from "./components/Layout";
-import Dashboard from "./pages/Dashboard";
 import Clients from "./pages/Clients";
 import Invoices from "./pages/Invoices";
 import Quotations from "./pages/Quotations";
@@ -29,7 +28,7 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/" element={
             <Layout>
-              <Dashboard />
+              <Clients />
             </Layout>
           } />
           <Route path="/clients" element={
