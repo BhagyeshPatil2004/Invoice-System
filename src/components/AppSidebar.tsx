@@ -41,7 +41,7 @@ export function AppSidebar() {
     isActive
   }: {
     isActive: boolean;
-  }) => isActive ? "bg-[hsl(var(--sidebar-accent))] text-white font-semibold border-l-4 border-primary shadow-sm" : "text-sidebar-foreground/70 hover:bg-sidebar-accent/30 hover:text-sidebar-foreground transition-colors";
+  }) => isActive ? "bg-primary text-primary-foreground font-semibold rounded-lg" : "text-sidebar-foreground/70 hover:bg-sidebar-accent/30 hover:text-sidebar-foreground transition-colors rounded-lg";
   return <Sidebar collapsible="icon">
       <div className="p-4 border-b border-sidebar-border">
         <div className="flex items-center gap-3">
