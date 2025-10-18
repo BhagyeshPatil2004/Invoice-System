@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Search, MoreHorizontal, Download, FileText, Trash2, Edit } from "lucide-react";
 import InvoiceDialog from "@/components/InvoiceDialog";
+import { useData } from "@/contexts/DataContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -63,7 +64,7 @@ const getStatusColor = (status: string) => {
 };
 
 export default function Invoices() {
-  const [invoices, setInvoices] = useState<any[]>([]);
+  const { invoices, setInvoices } = useData();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [isDialogOpen, setIsDialogOpen] = useState(false);

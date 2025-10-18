@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Search, MoreHorizontal, Download, Trash2, Edit } from "lucide-react";
+import { useData } from "@/contexts/DataContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -44,7 +45,7 @@ const getStatusBadge = (status: string) => {
 
 export default function Payables() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [payables, setPayables] = useState<any[]>([]);
+  const { payables, setPayables } = useData();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedPayable, setSelectedPayable] = useState<any>(null);

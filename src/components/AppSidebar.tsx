@@ -3,6 +3,8 @@ import { useLocation, NavLink } from "react-router-dom";
 import { Users, FileText, Receipt, DollarSign, Settings, TrendingUp, Calendar, Bell } from "lucide-react";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { NotificationDialog } from "@/components/NotificationDialog";
+import { useData } from "@/contexts/DataContext";
+import { isWithinInterval, addDays, parseISO } from "date-fns";
 const mainMenuItems = [{
   title: "Clients",
   url: "/",
@@ -31,12 +33,45 @@ const financialMenuItems = [{
 }];
 export function AppSidebar() {
   const [notificationOpen, setNotificationOpen] = useState(false);
+  const { invoices, payables } = useData();
   const {
     state
   } = useSidebar();
   const location = useLocation();
   const currentPath = location.pathname;
   const isCollapsed = state === "collapsed";
+
+  // Calculate notification count
+  const today = new Date();
+  const nextWeek = addDays(today, 7);
+  
+  const parseDate = (dateStr: string) => {
+    try {
+      return parseISO(dateStr);
+    } catch {
+      return new Date(dateStr);
+    }
+  };
+
+  const notificationCount = 
+    invoices.filter(invoice => {
+      if (invoice.status === 'paid') return false;
+      try {
+        const dueDate = parseDate(invoice.dueDate);
+        return isWithinInterval(dueDate, { start: today, end: nextWeek });
+      } catch {
+        return false;
+      }
+    }).length +
+    payables.filter(payable => {
+      if (payable.status === 'paid' || payable.amountDue === 0) return false;
+      try {
+        const dueDate = parseDate(payable.dueDate);
+        return isWithinInterval(dueDate, { start: today, end: nextWeek });
+      } catch {
+        return false;
+      }
+    }).length;
 
   // Active Menu Item styling - prominent and clear
   const getNavClass = ({
@@ -118,11 +153,15 @@ export function AppSidebar() {
         >
           <div className="relative">
             <Bell className="h-5 w-5 text-sidebar-foreground" />
-            <span className="absolute -top-1 -right-1 h-3 w-3 bg-danger rounded-full"></span>
+            {notificationCount > 0 && (
+              <span className="absolute -top-1 -right-1 h-3 w-3 bg-danger rounded-full"></span>
+            )}
           </div>
           {!isCollapsed && <div className="flex-1 text-left">
               <p className="text-sm font-medium text-sidebar-foreground">Notifications</p>
-              <p className="text-xs text-sidebar-foreground/70">3 new updates</p>
+              <p className="text-xs text-sidebar-foreground/70">
+                {notificationCount > 0 ? `${notificationCount} due within 7 days` : 'No upcoming dues'}
+              </p>
             </div>}
         </button>
       </div>
