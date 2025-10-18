@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Search, MoreHorizontal, Download, FileText, Trash2, Edit } from "lucide-react";
+import { Plus, Search, MoreHorizontal, Download, FileText, Trash2, Edit, Eye } from "lucide-react";
 import InvoiceDialog from "@/components/InvoiceDialog";
 import { useData } from "@/contexts/DataContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -70,6 +70,7 @@ export default function Invoices() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [statusDialogOpen, setStatusDialogOpen] = useState(false);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
   const [newStatus, setNewStatus] = useState<string>("");
   const { toast } = useToast();
@@ -100,6 +101,11 @@ export default function Invoices() {
       title: "Download Started",
       description: `Downloading invoice ${invoice.id}`,
     });
+  };
+
+  const handleViewClick = (invoice: any) => {
+    setSelectedInvoice(invoice);
+    setViewDialogOpen(true);
   };
 
   const handleStatusClick = (invoice: any) => {
@@ -316,6 +322,10 @@ export default function Invoices() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuItem onClick={() => handleViewClick(invoice)}>
+                            <Eye className="h-4 w-4 mr-2" />
+                            View Invoice
+                          </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleStatusClick(invoice)}>
                             <Edit className="h-4 w-4 mr-2" />
                             Change Status
@@ -348,6 +358,57 @@ export default function Invoices() {
           )}
         </CardContent>
       </Card>
+
+      {/* View Invoice Dialog */}
+      <AlertDialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
+        <AlertDialogContent className="max-w-2xl">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Invoice Details</AlertDialogTitle>
+            <AlertDialogDescription>
+              View complete information for invoice {selectedInvoice?.id}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="space-y-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">Invoice ID</label>
+                <p className="text-foreground font-medium mt-1">{selectedInvoice?.id}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">Status</label>
+                <div className="mt-1">
+                  <Badge className={getStatusBadge(selectedInvoice?.status)}>
+                    {selectedInvoice?.status?.charAt(0).toUpperCase() + selectedInvoice?.status?.slice(1)}
+                  </Badge>
+                </div>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">Client Name</label>
+                <p className="text-foreground font-medium mt-1">{selectedInvoice?.clientName}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">Amount</label>
+                <p className="text-foreground font-semibold mt-1">₹{selectedInvoice?.amount.toLocaleString()}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">Issue Date</label>
+                <p className="text-foreground mt-1">{selectedInvoice?.issueDate}</p>
+              </div>
+              <div>
+                <label className="text-sm font-medium text-muted-foreground">Due Date</label>
+                <p className="text-foreground mt-1">{selectedInvoice?.dueDate}</p>
+              </div>
+              <div className="col-span-2">
+                <label className="text-sm font-medium text-muted-foreground">Description</label>
+                <p className="text-foreground mt-1">{selectedInvoice?.description}</p>
+              </div>
+            </div>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Close</AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Status Update Dialog */}
       <AlertDialog open={statusDialogOpen} onOpenChange={setStatusDialogOpen}>
