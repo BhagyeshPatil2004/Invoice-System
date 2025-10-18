@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -29,6 +29,24 @@ export default function PayableDialog({ open, onOpenChange, onSave, payable }: P
     status: payable?.status || "pending",
     dueDate: payable?.dueDate || "",
   });
+
+  // Auto-update: If status is "paid", set amountPaid = billAmount
+  useEffect(() => {
+    if (formData.status === "paid" && formData.billAmount) {
+      const billAmount = parseFloat(formData.billAmount) || 0;
+      setFormData(prev => ({ ...prev, amountPaid: billAmount.toString() }));
+    }
+  }, [formData.status, formData.billAmount]);
+
+  // Auto-update: If billAmount = amountPaid, set status to "paid"
+  useEffect(() => {
+    const billAmount = parseFloat(formData.billAmount) || 0;
+    const amountPaid = parseFloat(formData.amountPaid) || 0;
+    
+    if (billAmount > 0 && billAmount === amountPaid && formData.status !== "paid") {
+      setFormData(prev => ({ ...prev, status: "paid" }));
+    }
+  }, [formData.billAmount, formData.amountPaid]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
