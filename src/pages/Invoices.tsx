@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Plus, Search, MoreHorizontal, Download, FileText, Trash2, Edit, Eye } from "lucide-react";
 import InvoiceDialog from "@/components/InvoiceDialog";
+import InvoiceTemplate from "@/components/InvoiceTemplate";
 import { useData } from "@/contexts/DataContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -361,51 +362,30 @@ export default function Invoices() {
 
       {/* View Invoice Dialog */}
       <AlertDialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
-        <AlertDialogContent className="max-w-2xl">
+        <AlertDialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
           <AlertDialogHeader>
-            <AlertDialogTitle>Invoice Details</AlertDialogTitle>
+            <AlertDialogTitle>Invoice Preview</AlertDialogTitle>
             <AlertDialogDescription>
-              View complete information for invoice {selectedInvoice?.id}
+              View and download invoice {selectedInvoice?.id}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          <div className="space-y-4 py-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Invoice ID</label>
-                <p className="text-foreground font-medium mt-1">{selectedInvoice?.id}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Status</label>
-                <div className="mt-1">
-                  <Badge className={getStatusBadge(selectedInvoice?.status)}>
-                    {selectedInvoice?.status?.charAt(0).toUpperCase() + selectedInvoice?.status?.slice(1)}
-                  </Badge>
-                </div>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Client Name</label>
-                <p className="text-foreground font-medium mt-1">{selectedInvoice?.clientName}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Amount</label>
-                <p className="text-foreground font-semibold mt-1">₹{selectedInvoice?.amount.toLocaleString()}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Issue Date</label>
-                <p className="text-foreground mt-1">{selectedInvoice?.issueDate}</p>
-              </div>
-              <div>
-                <label className="text-sm font-medium text-muted-foreground">Due Date</label>
-                <p className="text-foreground mt-1">{selectedInvoice?.dueDate}</p>
-              </div>
-              <div className="col-span-2">
-                <label className="text-sm font-medium text-muted-foreground">Description</label>
-                <p className="text-foreground mt-1">{selectedInvoice?.description}</p>
-              </div>
-            </div>
+          <div className="py-4">
+            {selectedInvoice && (
+              <InvoiceTemplate invoice={selectedInvoice} />
+            )}
           </div>
           <AlertDialogFooter>
             <AlertDialogCancel>Close</AlertDialogCancel>
+            <Button onClick={() => {
+              handleDownload(selectedInvoice);
+              toast({
+                title: "Download Ready",
+                description: "Your invoice is ready to download"
+              });
+            }}>
+              <Download className="h-4 w-4 mr-2" />
+              Download PDF
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
