@@ -361,7 +361,6 @@ export default function Invoices() {
               <SelectContent>
                 <SelectItem value="pending">Pending</SelectItem>
                 <SelectItem value="paid">Paid</SelectItem>
-                <SelectItem value="sent">Sent</SelectItem>
                 <SelectItem value="draft">Draft</SelectItem>
                 <SelectItem value="overdue">Overdue</SelectItem>
               </SelectContent>
