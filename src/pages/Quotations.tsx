@@ -6,39 +6,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
-
 const getStatusBadge = (status: string) => {
   const variants = {
     accepted: "bg-success/10 text-success border-success/20",
@@ -46,12 +18,13 @@ const getStatusBadge = (status: string) => {
     declined: "bg-danger/10 text-danger border-danger/20",
     draft: "bg-muted text-muted-foreground border-border"
   };
-  
   return variants[status as keyof typeof variants] || variants.draft;
 };
-
 export default function Quotations() {
-  const { invoices, setInvoices } = useData();
+  const {
+    invoices,
+    setInvoices
+  } = useData();
   const [quotations, setQuotations] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -59,48 +32,45 @@ export default function Quotations() {
   const [statusDialogOpen, setStatusDialogOpen] = useState(false);
   const [selectedQuotation, setSelectedQuotation] = useState<any>(null);
   const [newStatus, setNewStatus] = useState<string>("");
-  const { toast } = useToast();
-
+  const {
+    toast
+  } = useToast();
   const handleQuotationCreate = (newQuotation: any) => {
     setQuotations([...quotations, newQuotation]);
   };
-
   const handleDeleteClick = (quotation: any) => {
     setSelectedQuotation(quotation);
     setDeleteDialogOpen(true);
   };
-
   const handleDeleteConfirm = () => {
     if (selectedQuotation) {
       setQuotations(quotations.filter(q => q.id !== selectedQuotation.id));
       toast({
         title: "Quotation Deleted",
-        description: "Quotation has been successfully removed",
+        description: "Quotation has been successfully removed"
       });
       setDeleteDialogOpen(false);
       setSelectedQuotation(null);
     }
   };
-
   const handleDownload = (quotation: any) => {
     toast({
       title: "Download Started",
-      description: `Downloading quotation ${quotation.id}`,
+      description: `Downloading quotation ${quotation.id}`
     });
   };
-
   const handleStatusClick = (quotation: any) => {
     setSelectedQuotation(quotation);
     setNewStatus(quotation.status);
     setStatusDialogOpen(true);
   };
-
   const handleStatusUpdate = () => {
     if (selectedQuotation && newStatus) {
       // Update quotation status
-      setQuotations(quotations.map(q => 
-        q.id === selectedQuotation.id ? { ...q, status: newStatus } : q
-      ));
+      setQuotations(quotations.map(q => q.id === selectedQuotation.id ? {
+        ...q,
+        status: newStatus
+      } : q));
 
       // If status changed to "accepted", create an invoice
       if (newStatus === 'accepted') {
@@ -111,39 +81,28 @@ export default function Quotations() {
           amount: selectedQuotation.amount,
           status: 'pending',
           issueDate: new Date().toISOString().split('T')[0],
-          dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days from now
+          dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] // 30 days from now
         };
-        
         setInvoices([...invoices, newInvoice]);
-        
         toast({
           title: "Quotation Accepted & Invoice Created",
-          description: `Invoice ${newInvoice.id} has been created from this quotation`,
+          description: `Invoice ${newInvoice.id} has been created from this quotation`
         });
       } else {
         toast({
           title: "Status Updated",
-          description: `Quotation status changed to ${newStatus}`,
+          description: `Quotation status changed to ${newStatus}`
         });
       }
-      
       setStatusDialogOpen(false);
       setSelectedQuotation(null);
     }
   };
-  
-  const filteredQuotations = quotations.filter(quote => 
-    quote.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    quote.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    quote.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
+  const filteredQuotations = quotations.filter(quote => quote.id.toLowerCase().includes(searchTerm.toLowerCase()) || quote.clientName.toLowerCase().includes(searchTerm.toLowerCase()) || quote.description.toLowerCase().includes(searchTerm.toLowerCase()));
   const totalAmount = quotations.reduce((sum, quote) => sum + quote.amount, 0);
   const acceptedAmount = quotations.filter(q => q.status === 'accepted').reduce((sum, quote) => sum + quote.amount, 0);
   const pendingAmount = quotations.filter(q => q.status === 'sent').reduce((sum, quote) => sum + quote.amount, 0);
-
-  return (
-    <div className="space-y-6 animate-fade-in">
+  return <div className="space-y-6 animate-fade-in">
       <QuotationDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} onQuotationCreate={handleQuotationCreate} />
       {/* Page Header */}
       <div className="flex justify-between items-center">
@@ -166,40 +125,7 @@ export default function Quotations() {
       </div>
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="hover:shadow-md transition-shadow">
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold text-foreground">
-              ₹{totalAmount.toLocaleString()}
-            </div>
-            <p className="text-sm text-muted-foreground">Total Quoted</p>
-          </CardContent>
-        </Card>
-        <Card className="hover:shadow-md transition-shadow">
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold text-success">
-              ₹{acceptedAmount.toLocaleString()}
-            </div>
-            <p className="text-sm text-muted-foreground">Accepted</p>
-          </CardContent>
-        </Card>
-        <Card className="hover:shadow-md transition-shadow">
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold text-warning">
-              ₹{pendingAmount.toLocaleString()}
-            </div>
-            <p className="text-sm text-muted-foreground">Pending</p>
-          </CardContent>
-        </Card>
-        <Card className="hover:shadow-md transition-shadow">
-          <CardContent className="pt-6">
-            <div className="text-2xl font-bold text-foreground">
-              {quotations.length}
-            </div>
-            <p className="text-sm text-muted-foreground">Total Quotations</p>
-          </CardContent>
-        </Card>
-      </div>
+      
 
       {/* Quotations Table */}
       <Card>
@@ -213,12 +139,7 @@ export default function Quotations() {
           <div className="flex gap-4 mb-6">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input 
-                placeholder="Search quotations by ID, client, or description..." 
-                className="pl-10"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+              <Input placeholder="Search quotations by ID, client, or description..." className="pl-10" value={searchTerm} onChange={e => setSearchTerm(e.target.value)} />
             </div>
             <Button variant="outline">
               <Download className="h-4 w-4 mr-2" />
@@ -240,8 +161,7 @@ export default function Quotations() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredQuotations.map((quote) => (
-                  <TableRow key={quote.id} className="hover:bg-accent/50 transition-colors">
+                {filteredQuotations.map(quote => <TableRow key={quote.id} className="hover:bg-accent/50 transition-colors">
                     <TableCell>
                       <div>
                         <div className="font-medium text-foreground">{quote.id}</div>
@@ -283,28 +203,22 @@ export default function Quotations() {
                             <Download className="h-4 w-4 mr-2" />
                             Download PDF
                           </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            className="text-destructive"
-                            onClick={() => handleDeleteClick(quote)}
-                          >
+                          <DropdownMenuItem className="text-destructive" onClick={() => handleDeleteClick(quote)}>
                             <Trash2 className="h-4 w-4 mr-2" />
                             Delete Quotation
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
-                  </TableRow>
-                ))}
+                  </TableRow>)}
               </TableBody>
             </Table>
           </div>
 
-          {filteredQuotations.length === 0 && (
-            <div className="text-center py-12 text-muted-foreground">
+          {filteredQuotations.length === 0 && <div className="text-center py-12 text-muted-foreground">
               <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p>No quotations found matching your search.</p>
-            </div>
-          )}
+            </div>}
         </CardContent>
       </Card>
 
@@ -315,11 +229,9 @@ export default function Quotations() {
             <AlertDialogTitle>Update Quotation Status</AlertDialogTitle>
             <AlertDialogDescription>
               Change the status for quotation {selectedQuotation?.id}
-              {newStatus === 'accepted' && (
-                <span className="block mt-2 text-success font-medium">
+              {newStatus === 'accepted' && <span className="block mt-2 text-success font-medium">
                   Note: Accepting this quotation will automatically create an invoice.
-                </span>
-              )}
+                </span>}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="py-4">
@@ -361,6 +273,5 @@ export default function Quotations() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
-  );
+    </div>;
 }
