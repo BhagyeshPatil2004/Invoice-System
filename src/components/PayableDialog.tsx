@@ -30,21 +30,27 @@ export default function PayableDialog({ open, onOpenChange, onSave, payable }: P
     dueDate: payable?.dueDate || "",
   });
 
-  // Auto-update: If status is "paid", set amountPaid = billAmount
+  // Auto-update: Status changes affect Amount Paid
   useEffect(() => {
     if (formData.status === "paid" && formData.billAmount) {
       const billAmount = parseFloat(formData.billAmount) || 0;
       setFormData(prev => ({ ...prev, amountPaid: billAmount.toString() }));
+    } else if (formData.status === "pending") {
+      setFormData(prev => ({ ...prev, amountPaid: "0" }));
     }
-  }, [formData.status, formData.billAmount]);
+  }, [formData.status]);
 
-  // Auto-update: If billAmount = amountPaid, set status to "paid"
+  // Auto-update: If manually entering amounts and they match, set status to "paid"
   useEffect(() => {
     const billAmount = parseFloat(formData.billAmount) || 0;
     const amountPaid = parseFloat(formData.amountPaid) || 0;
     
+    // Only auto-update status if amounts match and status isn't already "paid"
     if (billAmount > 0 && billAmount === amountPaid && formData.status !== "paid") {
       setFormData(prev => ({ ...prev, status: "paid" }));
+    } else if (amountPaid === 0 && billAmount > 0 && formData.status === "paid") {
+      // If user clears amount paid, revert to pending
+      setFormData(prev => ({ ...prev, status: "pending" }));
     }
   }, [formData.billAmount, formData.amountPaid]);
 
