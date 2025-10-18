@@ -128,7 +128,9 @@ export default function Invoices() {
     
     const matchesStatus = statusFilter === "all" || 
       (statusFilter === "pending" && (invoice.status === "pending" || invoice.status === "sent")) ||
-      (statusFilter === "paid" && invoice.status === "paid");
+      (statusFilter === "paid" && invoice.status === "paid") ||
+      (statusFilter === "draft" && invoice.status === "draft") ||
+      (statusFilter === "overdue" && invoice.status === "overdue");
     
     return matchesSearch && matchesStatus;
   });
@@ -248,6 +250,8 @@ export default function Invoices() {
                 <SelectItem value="all">All Status</SelectItem>
                 <SelectItem value="pending">Pending</SelectItem>
                 <SelectItem value="paid">Paid</SelectItem>
+                <SelectItem value="draft">Draft</SelectItem>
+                <SelectItem value="overdue">Overdue</SelectItem>
               </SelectContent>
             </Select>
             <Button variant="outline">
