@@ -271,7 +271,7 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
                       />
                     </div>
                     <div className="col-span-2">
-                      <Label htmlFor={`rate-${item.id}`} className="text-xs text-muted-foreground">Rate (₹)</Label>
+                      <Label htmlFor={`rate-${item.id}`} className="text-xs text-muted-foreground">Per Quantity Rate</Label>
                       <Input
                         id={`rate-${item.id}`}
                         type="number"
