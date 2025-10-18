@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Plus, Search, MoreHorizontal, Download, FileText, Trash2, Edit } from "lucide-react";
 import QuotationDialog from "@/components/QuotationDialog";
+import { useData } from "@/contexts/DataContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -50,8 +51,8 @@ const getStatusBadge = (status: string) => {
 };
 
 export default function Quotations() {
+  const { invoices, setInvoices } = useData();
   const [quotations, setQuotations] = useState<any[]>([]);
-  const [invoices, setInvoices] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
