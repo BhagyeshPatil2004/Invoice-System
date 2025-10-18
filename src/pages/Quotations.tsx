@@ -220,9 +220,6 @@ export default function Quotations() {
               />
             </div>
             <Button variant="outline">
-              Filter
-            </Button>
-            <Button variant="outline">
               <Download className="h-4 w-4 mr-2" />
               Export
             </Button>
