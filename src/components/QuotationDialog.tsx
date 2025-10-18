@@ -3,7 +3,6 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, Trash2 } from "lucide-react";
@@ -24,7 +23,6 @@ interface LineItem {
 
 export default function QuotationDialog({ open, onOpenChange, onQuotationCreate }: QuotationDialogProps) {
   const [clientName, setClientName] = useState("");
-  const [description, setDescription] = useState("");
   const [issueDate, setIssueDate] = useState(new Date().toISOString().split('T')[0]);
   const [validUntil, setValidUntil] = useState("");
   const [lineItems, setLineItems] = useState<LineItem[]>([
@@ -69,7 +67,7 @@ export default function QuotationDialog({ open, onOpenChange, onQuotationCreate 
     const newQuotation = {
       id: `QUO-${Date.now()}`,
       clientName,
-      description: description || "Quotation",
+      description: "Quotation",
       amount: calculateTotal(),
       status: "draft",
       issueDate,
@@ -86,7 +84,6 @@ export default function QuotationDialog({ open, onOpenChange, onQuotationCreate 
 
     // Reset form
     setClientName("");
-    setDescription("");
     setIssueDate(new Date().toISOString().split('T')[0]);
     setValidUntil("");
     setLineItems([{ description: "", quantity: 1, rate: 0, taxType: 'none', taxRate: 0 }]);
@@ -110,16 +107,6 @@ export default function QuotationDialog({ open, onOpenChange, onQuotationCreate 
                 value={clientName}
                 onChange={(e) => setClientName(e.target.value)}
                 placeholder="Enter client name"
-              />
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="description">Description</Label>
-              <Input
-                id="description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Brief description"
               />
             </div>
           </div>
