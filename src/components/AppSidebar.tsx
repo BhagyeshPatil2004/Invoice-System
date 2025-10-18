@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useLocation, NavLink } from "react-router-dom";
 import { Users, FileText, Receipt, DollarSign, Settings, TrendingUp, Calendar, Bell } from "lucide-react";
 import { Sidebar, SidebarContent, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
+import { NotificationDialog } from "@/components/NotificationDialog";
 const mainMenuItems = [{
   title: "Clients",
   url: "/",
@@ -29,6 +30,7 @@ const financialMenuItems = [{
   icon: Calendar
 }];
 export function AppSidebar() {
+  const [notificationOpen, setNotificationOpen] = useState(false);
   const {
     state
   } = useSidebar();
@@ -110,16 +112,21 @@ export function AppSidebar() {
 
       {/* Notifications Section at Bottom */}
       <div className="mt-auto p-4 border-t border-sidebar-border">
-        <div className="flex items-center gap-3">
+        <button 
+          onClick={() => setNotificationOpen(true)}
+          className="flex items-center gap-3 w-full hover:bg-sidebar-accent/30 p-2 rounded-lg transition-colors"
+        >
           <div className="relative">
             <Bell className="h-5 w-5 text-sidebar-foreground" />
             <span className="absolute -top-1 -right-1 h-3 w-3 bg-danger rounded-full"></span>
           </div>
-          {!isCollapsed && <div className="flex-1">
+          {!isCollapsed && <div className="flex-1 text-left">
               <p className="text-sm font-medium text-sidebar-foreground">Notifications</p>
               <p className="text-xs text-sidebar-foreground/70">3 new updates</p>
             </div>}
-        </div>
+        </button>
       </div>
+
+      <NotificationDialog open={notificationOpen} onOpenChange={setNotificationOpen} />
     </Sidebar>;
 }
