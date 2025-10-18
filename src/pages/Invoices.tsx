@@ -65,6 +65,7 @@ const getStatusColor = (status: string) => {
 export default function Invoices() {
   const [invoices, setInvoices] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState<string>("all");
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [statusDialogOpen, setStatusDialogOpen] = useState(false);
@@ -120,11 +121,17 @@ export default function Invoices() {
     }
   };
   
-  const filteredInvoices = invoices.filter(invoice => 
-    invoice.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    invoice.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    invoice.description.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredInvoices = invoices.filter(invoice => {
+    const matchesSearch = invoice.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      invoice.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      invoice.description.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesStatus = statusFilter === "all" || 
+      (statusFilter === "pending" && (invoice.status === "pending" || invoice.status === "sent")) ||
+      (statusFilter === "paid" && invoice.status === "paid");
+    
+    return matchesSearch && matchesStatus;
+  });
 
   const totalAmount = invoices.reduce((sum, invoice) => sum + invoice.amount, 0);
   const paidAmount = invoices.filter(i => i.status === 'paid').reduce((sum, invoice) => sum + invoice.amount, 0);
@@ -233,9 +240,16 @@ export default function Invoices() {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-            <Button variant="outline">
-              Filter
-            </Button>
+            <Select value={statusFilter} onValueChange={setStatusFilter}>
+              <SelectTrigger className="w-[150px]">
+                <SelectValue placeholder="Filter" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Status</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="paid">Paid</SelectItem>
+              </SelectContent>
+            </Select>
             <Button variant="outline">
               <Download className="h-4 w-4 mr-2" />
               Export
