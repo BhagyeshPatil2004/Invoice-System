@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { DataProvider } from "@/contexts/DataContext";
-import { InvoiceSettingsProvider } from "@/contexts/InvoiceSettingsContext";
 import Layout from "./components/Layout";
 import Clients from "./pages/Clients";
 import Invoices from "./pages/Invoices";
@@ -24,10 +23,9 @@ const App = () => (
     <ThemeProvider attribute="class" defaultTheme="dark" forcedTheme="dark">
       <TooltipProvider>
         <DataProvider>
-          <InvoiceSettingsProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
         <Routes>
           <Route path="/auth" element={<Auth />} />
           <Route path="/" element={
@@ -74,7 +72,6 @@ const App = () => (
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
-          </InvoiceSettingsProvider>
         </DataProvider>
     </TooltipProvider>
     </ThemeProvider>

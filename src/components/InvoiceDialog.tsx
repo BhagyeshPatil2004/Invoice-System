@@ -49,6 +49,9 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
   const [lineItems, setLineItems] = useState<LineItem[]>([
     { id: "1", description: "", quantity: 1, rate: 0, taxType: 'none', taxRate: 0 }
   ]);
+  const [bankName, setBankName] = useState("");
+  const [accountName, setAccountName] = useState("");
+  const [accountNumber, setAccountNumber] = useState("");
 
   const addLineItem = () => {
     setLineItems([
@@ -113,6 +116,9 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
     setDueDate("");
     setNotes("");
     setLineItems([{ id: "1", description: "", quantity: 1, rate: 0, taxType: 'none', taxRate: 0 }]);
+    setBankName("");
+    setAccountName("");
+    setAccountNumber("");
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -158,6 +164,11 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
       dueDate,
       notes,
       lineItems,
+      bankDetails: bankName ? {
+        bankName,
+        accountName,
+        accountNumber,
+      } : undefined,
     };
 
     onInvoiceCreate(newInvoice);
@@ -408,6 +419,42 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
                   (Includes ₹{calculateTotalTax().toFixed(2)} in taxes)
                 </div>
               )}
+            </div>
+          </div>
+
+          {/* Bank Details */}
+          <Separator className="my-4" />
+          
+          <div className="space-y-4">
+            <Label className="text-base font-semibold">Bank Details (Optional)</Label>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="bankName">Bank Name</Label>
+                <Input
+                  id="bankName"
+                  placeholder="Enter bank name"
+                  value={bankName}
+                  onChange={(e) => setBankName(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="accountName">Account Name</Label>
+                <Input
+                  id="accountName"
+                  placeholder="Enter account name"
+                  value={accountName}
+                  onChange={(e) => setAccountName(e.target.value)}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="accountNumber">Account Number</Label>
+                <Input
+                  id="accountNumber"
+                  placeholder="Enter account number"
+                  value={accountNumber}
+                  onChange={(e) => setAccountNumber(e.target.value)}
+                />
+              </div>
             </div>
           </div>
 
