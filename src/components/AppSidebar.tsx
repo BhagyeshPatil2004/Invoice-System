@@ -19,10 +19,6 @@ const mainMenuItems = [{
   icon: Receipt
 }];
 const financialMenuItems = [{
-  title: "Receivables",
-  url: "/receivables",
-  icon: TrendingUp
-}, {
   title: "Payables",
   url: "/payables",
   icon: DollarSign
@@ -94,9 +90,6 @@ export function AppSidebar() {
 
       <SidebarContent className="bg-black">
         <SidebarGroup>
-          <SidebarGroupLabel className="text-sidebar-foreground/70 font-medium">
-            Main
-          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {mainMenuItems.map(item => <SidebarMenuItem key={item.title}>
@@ -112,9 +105,6 @@ export function AppSidebar() {
         </SidebarGroup>
 
         <SidebarGroup>
-          <SidebarGroupLabel className="text-sidebar-foreground/70 font-medium">
-            Financial
-          </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {financialMenuItems.map(item => <SidebarMenuItem key={item.title}>

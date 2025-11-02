@@ -9,7 +9,6 @@ import Layout from "./components/Layout";
 import Clients from "./pages/Clients";
 import Invoices from "./pages/Invoices";
 import Quotations from "./pages/Quotations";
-import Receivables from "./pages/Receivables";
 import Payables from "./pages/Payables";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
@@ -46,11 +45,6 @@ const App = () => (
           <Route path="/quotations" element={
             <Layout>
               <Quotations />
-            </Layout>
-          } />
-          <Route path="/receivables" element={
-            <Layout>
-              <Receivables />
             </Layout>
           } />
           <Route path="/payables" element={
