@@ -52,6 +52,7 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
   const [bankName, setBankName] = useState("");
   const [accountName, setAccountName] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
+  const [advancePayment, setAdvancePayment] = useState(0);
 
   const addLineItem = () => {
     setLineItems([
@@ -119,6 +120,7 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
     setBankName("");
     setAccountName("");
     setAccountNumber("");
+    setAdvancePayment(0);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -153,13 +155,17 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
       return;
     }
 
+    const grandTotal = calculateGrandTotal();
+    const balanceDue = grandTotal - advancePayment;
+    const status = advancePayment >= grandTotal ? "paid" : advancePayment > 0 ? "pending" : "pending";
+
     const newInvoice = {
       id: invoiceNumber,
       clientId,
       clientName: clientId,
       description: lineItems[0]?.description || "Invoice",
       amount: calculateGrandTotal(),
-      status: "pending",
+      status,
       issueDate,
       dueDate,
       notes,
@@ -169,6 +175,8 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
         accountName,
         accountNumber,
       } : undefined,
+      advancePayment,
+      balanceDue,
     };
 
     onInvoiceCreate(newInvoice);
@@ -419,6 +427,54 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
                   (Includes ₹{calculateTotalTax().toFixed(2)} in taxes)
                 </div>
               )}
+
+              {advancePayment > 0 && (
+                <>
+                  <Separator />
+                  <div className="flex justify-between text-sm">
+                    <span className="text-muted-foreground">Advance Payment:</span>
+                    <span className="font-semibold text-success">₹{advancePayment.toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between items-center pt-2">
+                    <span className="text-base font-bold text-foreground">Balance Due:</span>
+                    <span className="text-xl font-bold text-warning">₹{(calculateGrandTotal() - advancePayment).toFixed(2)}</span>
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+
+          {/* Advance Payment */}
+          <Separator className="my-4" />
+          
+          <div className="space-y-4">
+            <div>
+              <Label className="text-base font-semibold">Advance Payment (Optional)</Label>
+              <p className="text-sm text-muted-foreground mt-1">Enter any advance amount received from the client</p>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="advancePayment">Advance Amount</Label>
+              <Input
+                id="advancePayment"
+                type="number"
+                min="0"
+                max={calculateGrandTotal()}
+                step="0.01"
+                placeholder="0.00"
+                value={advancePayment || ""}
+                onChange={(e) => {
+                  const value = parseFloat(e.target.value) || 0;
+                  if (value > calculateGrandTotal()) {
+                    toast({
+                      title: "Invalid Amount",
+                      description: "Advance payment cannot exceed the total amount",
+                      variant: "destructive",
+                    });
+                    return;
+                  }
+                  setAdvancePayment(value);
+                }}
+              />
             </div>
           </div>
 

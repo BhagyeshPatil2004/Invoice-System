@@ -20,6 +20,8 @@ interface InvoiceData {
     accountName: string;
     accountNumber: string;
   };
+  advancePayment?: number;
+  balanceDue?: number;
 }
 
 interface InvoiceTemplateProps {
@@ -51,6 +53,8 @@ export default function InvoiceTemplate({ invoice }: InvoiceTemplateProps) {
   };
 
   const total = subtotal + totalTax;
+  const advancePayment = invoice.advancePayment || 0;
+  const balanceDue = total - advancePayment;
 
   const bankDetails = invoice.bankDetails || {
     bankName: "",
@@ -114,6 +118,18 @@ export default function InvoiceTemplate({ invoice }: InvoiceTemplateProps) {
           <span className="mr-4">TOTAL</span>
           <span className="w-32 text-right">₹{total.toFixed(2)}</span>
         </div>
+        {advancePayment > 0 && (
+          <>
+            <div className="flex justify-end text-sm py-2">
+              <span className="text-green-700 mr-4 font-semibold">ADVANCE PAID</span>
+              <span className="w-32 text-right text-green-700 font-semibold">₹{advancePayment.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-end py-4 px-4 font-bold text-xl bg-yellow-100 border-2 border-yellow-400 text-gray-900">
+              <span className="mr-4">BALANCE DUE</span>
+              <span className="w-32 text-right">₹{balanceDue.toFixed(2)}</span>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Footer */}

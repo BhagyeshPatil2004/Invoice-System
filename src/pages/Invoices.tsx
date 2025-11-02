@@ -369,6 +369,38 @@ export default function Invoices() {
               View and download invoice {selectedInvoice?.id}
             </AlertDialogDescription>
           </AlertDialogHeader>
+          
+          {/* Payment Status Summary */}
+          {selectedInvoice && (
+            <div className="bg-muted/30 p-4 rounded-lg border border-border mb-4">
+              <div className="grid grid-cols-3 gap-4 text-sm">
+                <div>
+                  <p className="text-muted-foreground">Total Amount</p>
+                  <p className="text-lg font-bold text-foreground">₹{selectedInvoice.amount.toFixed(2)}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Advance Paid</p>
+                  <p className="text-lg font-bold text-success">₹{(selectedInvoice.advancePayment || 0).toFixed(2)}</p>
+                </div>
+                <div>
+                  <p className="text-muted-foreground">Balance Due</p>
+                  <p className="text-lg font-bold text-warning">₹{(selectedInvoice.amount - (selectedInvoice.advancePayment || 0)).toFixed(2)}</p>
+                </div>
+              </div>
+              
+              {/* Payment Status Badge */}
+              <div className="mt-3">
+                {(selectedInvoice.advancePayment || 0) >= selectedInvoice.amount ? (
+                  <Badge className="bg-success/10 text-success border-success/20">Fully Paid</Badge>
+                ) : (selectedInvoice.advancePayment || 0) > 0 ? (
+                  <Badge className="bg-warning/10 text-warning border-warning/20">Partially Paid</Badge>
+                ) : (
+                  <Badge className="bg-muted text-muted-foreground border-border">Payment Pending</Badge>
+                )}
+              </div>
+            </div>
+          )}
+
           <div className="py-4">
             {selectedInvoice && (
               <InvoiceTemplate invoice={selectedInvoice} />
