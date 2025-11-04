@@ -63,7 +63,7 @@ export default function InvoiceTemplate({ invoice }: InvoiceTemplateProps) {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto bg-white p-12 shadow-lg" style={{ fontFamily: 'Arial, sans-serif' }}>
+    <div className="w-full mx-auto bg-white shadow-lg" style={{ fontFamily: 'Arial, sans-serif', width: '210mm', minHeight: '297mm', padding: '20mm' }}>
       {/* Header */}
       <div className="text-center mb-12">
         <h1 className="text-3xl font-bold tracking-wider mb-2 text-gray-900">

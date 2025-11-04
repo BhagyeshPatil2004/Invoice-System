@@ -444,40 +444,6 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
             </div>
           </div>
 
-          {/* Advance Payment */}
-          <Separator className="my-4" />
-          
-          <div className="space-y-4">
-            <div>
-              <Label className="text-base font-semibold">Advance Payment (Optional)</Label>
-              <p className="text-sm text-muted-foreground mt-1">Enter any advance amount received from the client</p>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="advancePayment">Advance Amount</Label>
-              <Input
-                id="advancePayment"
-                type="number"
-                min="0"
-                max={calculateGrandTotal()}
-                step="0.01"
-                placeholder="0.00"
-                value={advancePayment || ""}
-                onChange={(e) => {
-                  const value = parseFloat(e.target.value) || 0;
-                  if (value > calculateGrandTotal()) {
-                    toast({
-                      title: "Invalid Amount",
-                      description: "Advance payment cannot exceed the total amount",
-                      variant: "destructive",
-                    });
-                    return;
-                  }
-                  setAdvancePayment(value);
-                }}
-              />
-            </div>
-          </div>
-
           {/* Bank Details */}
           <Separator className="my-4" />
           
@@ -527,20 +493,50 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end gap-3 pt-4">
-            <Button 
-              type="button" 
-              variant="outline" 
-              onClick={() => {
-                resetForm();
-                onOpenChange(false);
-              }}
-            >
-              Cancel
-            </Button>
-            <Button type="submit" className="hover-scale bg-gradient-to-r from-primary to-primary-hover">
-              Create Invoice
-            </Button>
+          <Separator className="my-4" />
+          
+          <div className="flex justify-between items-end gap-6">
+            <div className="flex-1 space-y-2">
+              <Label htmlFor="advancePayment" className="text-base font-semibold">Advance Payment (Optional)</Label>
+              <Input
+                id="advancePayment"
+                type="number"
+                min="0"
+                max={calculateGrandTotal()}
+                step="0.01"
+                placeholder="0.00"
+                value={advancePayment || ""}
+                onChange={(e) => {
+                  const value = parseFloat(e.target.value) || 0;
+                  if (value > calculateGrandTotal()) {
+                    toast({
+                      title: "Invalid Amount",
+                      description: "Advance payment cannot exceed the total amount",
+                      variant: "destructive",
+                    });
+                    return;
+                  }
+                  setAdvancePayment(value);
+                }}
+              />
+              <p className="text-xs text-muted-foreground">Enter any advance amount received from the client</p>
+            </div>
+
+            <div className="flex gap-3">
+              <Button 
+                type="button" 
+                variant="outline" 
+                onClick={() => {
+                  resetForm();
+                  onOpenChange(false);
+                }}
+              >
+                Cancel
+              </Button>
+              <Button type="submit" className="hover-scale bg-gradient-to-r from-primary to-primary-hover">
+                Create Invoice
+              </Button>
+            </div>
           </div>
         </form>
       </DialogContent>
