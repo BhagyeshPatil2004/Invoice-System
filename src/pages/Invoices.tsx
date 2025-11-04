@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Search, MoreHorizontal, Download, FileText, Trash2, Edit, Eye } from "lucide-react";
+import { Plus, Search, MoreHorizontal, Download, FileText, Trash2, Edit, Eye, DollarSign } from "lucide-react";
 import InvoiceDialog from "@/components/InvoiceDialog";
 import InvoiceTemplate from "@/components/InvoiceTemplate";
 import { useData } from "@/contexts/DataContext";
@@ -72,8 +72,10 @@ export default function Invoices() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [statusDialogOpen, setStatusDialogOpen] = useState(false);
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
+  const [advancePaymentDialogOpen, setAdvancePaymentDialogOpen] = useState(false);
   const [selectedInvoice, setSelectedInvoice] = useState<any>(null);
   const [newStatus, setNewStatus] = useState<string>("");
+  const [advancePaymentAmount, setAdvancePaymentAmount] = useState<number>(0);
   const { toast } = useToast();
 
   const handleInvoiceCreate = (newInvoice: any) => {
@@ -125,6 +127,58 @@ export default function Invoices() {
         description: `Invoice status changed to ${newStatus}`,
       });
       setStatusDialogOpen(false);
+      setSelectedInvoice(null);
+    }
+  };
+
+  const handleAdvancePaymentClick = (invoice: any) => {
+    setSelectedInvoice(invoice);
+    setAdvancePaymentAmount(invoice.advancePayment || 0);
+    setAdvancePaymentDialogOpen(true);
+  };
+
+  const handleAdvancePaymentUpdate = () => {
+    if (selectedInvoice) {
+      const total = selectedInvoice.amount;
+      
+      if (advancePaymentAmount < 0) {
+        toast({
+          title: "Invalid Amount",
+          description: "Advance payment cannot be negative",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      if (advancePaymentAmount > total) {
+        toast({
+          title: "Invalid Amount",
+          description: "Advance payment cannot exceed the total amount",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Determine new status based on payment
+      let newStatus = selectedInvoice.status;
+      if (advancePaymentAmount >= total) {
+        newStatus = 'paid';
+      } else if (advancePaymentAmount > 0) {
+        newStatus = 'partial';
+      }
+
+      setInvoices(invoices.map(inv => 
+        inv.id === selectedInvoice.id 
+          ? { ...inv, advancePayment: advancePaymentAmount, status: newStatus } 
+          : inv
+      ));
+      
+      toast({
+        title: "Payment Updated",
+        description: `Advance payment updated to ₹${advancePaymentAmount.toFixed(2)}`,
+      });
+      
+      setAdvancePaymentDialogOpen(false);
       setSelectedInvoice(null);
     }
   };
@@ -327,6 +381,10 @@ export default function Invoices() {
                             <Eye className="h-4 w-4 mr-2" />
                             View Invoice
                           </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleAdvancePaymentClick(invoice)}>
+                            <DollarSign className="h-4 w-4 mr-2" />
+                            Advance Payment
+                          </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleStatusClick(invoice)}>
                             <Edit className="h-4 w-4 mr-2" />
                             Change Status
@@ -448,6 +506,54 @@ export default function Invoices() {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleStatusUpdate}>
               Update Status
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Advance Payment Update Dialog */}
+      <AlertDialog open={advancePaymentDialogOpen} onOpenChange={setAdvancePaymentDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Update Advance Payment</AlertDialogTitle>
+            <AlertDialogDescription>
+              Update the advance payment amount for invoice {selectedInvoice?.id}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="py-4 space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Total Amount</label>
+              <div className="text-2xl font-bold text-foreground">
+                ₹{selectedInvoice?.amount.toFixed(2)}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label htmlFor="advanceAmount" className="text-sm font-medium">Advance Payment Amount</label>
+              <Input
+                id="advanceAmount"
+                type="number"
+                min="0"
+                max={selectedInvoice?.amount || 0}
+                step="0.01"
+                value={advancePaymentAmount}
+                onChange={(e) => setAdvancePaymentAmount(parseFloat(e.target.value) || 0)}
+                placeholder="0.00"
+              />
+              <p className="text-xs text-muted-foreground">
+                Enter the advance payment amount received from the client
+              </p>
+            </div>
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Balance Due</label>
+              <div className="text-xl font-bold text-warning">
+                ₹{((selectedInvoice?.amount || 0) - advancePaymentAmount).toFixed(2)}
+              </div>
+            </div>
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleAdvancePaymentUpdate}>
+              Update Payment
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
