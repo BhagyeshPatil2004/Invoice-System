@@ -127,7 +127,7 @@ export default function InvoiceTemplate({ invoice }: InvoiceTemplateProps) {
           <span className="text-gray-600 mr-4">{getTaxLabel()}</span>
           <span className="w-32 text-right text-gray-600">₹{totalTax.toFixed(2)}</span>
         </div>
-        <div className="flex justify-end py-4 px-6 font-bold text-2xl bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg shadow-lg mb-4">
+        <div className="flex justify-end py-3 px-6 font-bold text-base bg-gray-200 text-gray-900 rounded-lg mb-4">
           <span className="mr-4">TOTAL</span>
           <span className="w-32 text-right">₹{total.toFixed(2)}</span>
         </div>
@@ -137,7 +137,7 @@ export default function InvoiceTemplate({ invoice }: InvoiceTemplateProps) {
               <span className="text-green-700 mr-4 font-semibold">ADVANCE PAID</span>
               <span className="w-32 text-right text-green-700 font-semibold">₹{advancePayment.toFixed(2)}</span>
             </div>
-            <div className="flex justify-end py-4 px-6 font-bold text-xl bg-yellow-100 border-2 border-yellow-500 text-gray-900 rounded-lg shadow-md">
+            <div className="flex justify-end py-3 px-6 font-bold text-base bg-yellow-100 border-2 border-yellow-500 text-gray-900 rounded-lg">
               <span className="mr-4">BALANCE DUE</span>
               <span className="w-32 text-right">₹{balanceDue.toFixed(2)}</span>
             </div>
