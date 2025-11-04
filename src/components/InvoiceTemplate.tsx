@@ -107,16 +107,6 @@ export default function InvoiceTemplate({ invoice }: InvoiceTemplateProps) {
       {/* Spacer to push totals to bottom */}
       <div style={{ flex: 1 }} />
 
-      {/* Bank Details */}
-      {bankDetails.bankName && (
-        <div className="mb-6">
-          <h3 className="font-bold mb-2 text-gray-900">BANK DETAILS</h3>
-          <p className="text-sm text-gray-700">{bankDetails.bankName}</p>
-          <p className="text-sm text-gray-700">Account Name: {bankDetails.accountName}</p>
-          <p className="text-sm text-gray-700">Account No.: {bankDetails.accountNumber}</p>
-        </div>
-      )}
-
       {/* Totals Section - At Bottom */}
       <div className="space-y-2 mt-auto pt-8 border-t-2 border-gray-300">
         <div className="flex justify-end text-sm">
@@ -131,17 +121,15 @@ export default function InvoiceTemplate({ invoice }: InvoiceTemplateProps) {
           <span className="mr-4">TOTAL</span>
           <span className="w-32 text-right">₹{total.toFixed(2)}</span>
         </div>
-        {advancePayment > 0 && (
-          <>
-            <div className="flex justify-end text-sm py-2">
-              <span className="text-green-700 mr-4 font-semibold">ADVANCE PAID</span>
-              <span className="w-32 text-right text-green-700 font-semibold">₹{advancePayment.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-end py-3 px-6 font-bold text-base bg-yellow-100 border-2 border-yellow-500 text-gray-900 rounded-lg">
-              <span className="mr-4">BALANCE DUE</span>
-              <span className="w-32 text-right">₹{balanceDue.toFixed(2)}</span>
-            </div>
-          </>
+        
+        {/* Bank Details */}
+        {bankDetails.bankName && (
+          <div className="mb-6">
+            <h3 className="font-bold mb-2 text-gray-900">BANK DETAILS</h3>
+            <p className="text-sm text-gray-700">{bankDetails.bankName}</p>
+            <p className="text-sm text-gray-700">Account Name: {bankDetails.accountName}</p>
+            <p className="text-sm text-gray-700">Account No.: {bankDetails.accountNumber}</p>
+          </div>
         )}
         
         {/* Thank You Message */}
