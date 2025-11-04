@@ -104,18 +104,18 @@ export default function InvoiceTemplate({ invoice }: InvoiceTemplateProps) {
         ))}
       </div>
 
+      {/* Spacer to push totals to bottom */}
+      <div style={{ flex: 1 }} />
+
       {/* Bank Details */}
       {bankDetails.bankName && (
-        <div className="mb-8">
+        <div className="mb-6">
           <h3 className="font-bold mb-2 text-gray-900">BANK DETAILS</h3>
           <p className="text-sm text-gray-700">{bankDetails.bankName}</p>
           <p className="text-sm text-gray-700">Account Name: {bankDetails.accountName}</p>
           <p className="text-sm text-gray-700">Account No.: {bankDetails.accountNumber}</p>
         </div>
       )}
-
-      {/* Spacer to push totals to bottom */}
-      <div style={{ flex: 1 }} />
 
       {/* Totals Section - At Bottom */}
       <div className="space-y-2 mt-auto pt-8 border-t-2 border-gray-300">
