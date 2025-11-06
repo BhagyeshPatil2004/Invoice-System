@@ -40,16 +40,16 @@ export default function Reports() {
       }
     };
 
-    const filteredInvoices = invoices.filter(inv => filterDate(inv.date));
-    const filteredPayables = payables.filter(pay => filterDate(pay.date));
+    const filteredInvoices = invoices.filter(inv => filterDate(inv.issueDate));
+    const filteredPayables = payables.filter(pay => filterDate(pay.dueDate));
 
     const totalRevenue = filteredInvoices
-      .filter(inv => inv.status === "Paid")
-      .reduce((sum, inv) => sum + inv.total, 0);
+      .filter(inv => inv.status === "paid")
+      .reduce((sum, inv) => sum + inv.amount, 0);
 
     const totalExpenses = filteredPayables
-      .filter(pay => pay.status === "Paid")
-      .reduce((sum, pay) => sum + pay.amount, 0);
+      .filter(pay => pay.status === "paid")
+      .reduce((sum, pay) => sum + pay.billAmount, 0);
 
     const profit = totalRevenue - totalExpenses;
     const profitMargin = totalRevenue > 0 ? ((profit / totalRevenue) * 100).toFixed(1) : 0;
@@ -61,21 +61,21 @@ export default function Reports() {
       
       const monthRevenue = invoices
         .filter(inv => {
-          const invDate = new Date(inv.date);
+          const invDate = new Date(inv.issueDate);
           return invDate.getMonth() === i && 
                  invDate.getFullYear() === now.getFullYear() &&
-                 inv.status === "Paid";
+                 inv.status === "paid";
         })
-        .reduce((sum, inv) => sum + inv.total, 0);
+        .reduce((sum, inv) => sum + inv.amount, 0);
 
       const monthExpenses = payables
         .filter(pay => {
-          const payDate = new Date(pay.date);
+          const payDate = new Date(pay.dueDate);
           return payDate.getMonth() === i && 
                  payDate.getFullYear() === now.getFullYear() &&
-                 pay.status === "Paid";
+                 pay.status === "paid";
         })
-        .reduce((sum, pay) => sum + pay.amount, 0);
+        .reduce((sum, pay) => sum + pay.billAmount, 0);
 
       return {
         month: monthName,
@@ -384,10 +384,10 @@ export default function Reports() {
                     {invoices
                       .reduce((acc: any[], inv) => {
                         const existing = acc.find(item => item.client === inv.clientName);
-                        if (existing && inv.status === "Paid") {
-                          existing.total += inv.total;
-                        } else if (inv.status === "Paid") {
-                          acc.push({ client: inv.clientName, total: inv.total });
+                        if (existing && inv.status === "paid") {
+                          existing.total += inv.amount;
+                        } else if (inv.status === "paid") {
+                          acc.push({ client: inv.clientName, total: inv.amount });
                         }
                         return acc;
                       }, [])
