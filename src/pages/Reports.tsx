@@ -13,6 +13,7 @@ import {
 import { useData } from "@/contexts/DataContext";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { Bar, BarChart, Line, LineChart, XAxis, YAxis, CartesianGrid, Legend, ResponsiveContainer } from "recharts";
+import { toast } from "sonner";
 
 export default function Reports() {
   const [dateRange, setDateRange] = useState("monthly");
@@ -111,6 +112,32 @@ export default function Reports() {
     },
   };
 
+  const handleExport = () => {
+    // Create CSV content
+    const csvContent = [
+      ["Month", "Revenue", "Expenses", "Profit"],
+      ...analytics.monthlyData.map(row => [
+        row.month,
+        row.revenue.toFixed(2),
+        row.expenses.toFixed(2),
+        row.profit.toFixed(2)
+      ])
+    ].map(row => row.join(",")).join("\n");
+
+    // Create download link
+    const blob = new Blob([csvContent], { type: "text/csv" });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `financial-report-${dateRange}-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    
+    toast.success("Report exported successfully!");
+  };
+
   return (
     <div className="space-y-6 animate-fade-in">
       {/* Page Header */}
@@ -134,7 +161,7 @@ export default function Reports() {
               <SelectItem value="yearly">This Year</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline">
+          <Button variant="outline" onClick={handleExport}>
             <Download className="h-4 w-4 mr-2" />
             Export Report
           </Button>
