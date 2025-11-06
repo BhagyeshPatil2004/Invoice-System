@@ -235,10 +235,9 @@ export default function Reports() {
 
       {/* Reports Tabs */}
       <Tabs defaultValue="sales" className="space-y-4">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="sales">Sales Report</TabsTrigger>
           <TabsTrigger value="expenses">Expenses Report</TabsTrigger>
-          <TabsTrigger value="profit">Profit & Loss</TabsTrigger>
           <TabsTrigger value="clients">Client Report</TabsTrigger>
         </TabsList>
 
@@ -320,50 +319,6 @@ export default function Reports() {
           </Card>
         </TabsContent>
 
-        <TabsContent value="profit" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <DollarSign className="h-5 w-5" />
-                Profit & Loss Statement
-              </CardTitle>
-              <CardDescription>
-                Comprehensive P&L analysis for your business
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ChartContainer config={chartConfig} className="h-[400px]">
-                <LineChart data={analytics.monthlyData}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                  <XAxis dataKey="month" className="text-xs" />
-                  <YAxis className="text-xs" />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Legend />
-                  <Line type="monotone" dataKey="revenue" stroke="var(--color-revenue)" strokeWidth={2} name="Revenue" />
-                  <Line type="monotone" dataKey="expenses" stroke="var(--color-expenses)" strokeWidth={2} name="Expenses" />
-                  <Line type="monotone" dataKey="profit" stroke="var(--color-profit)" strokeWidth={2} name="Profit" />
-                </LineChart>
-              </ChartContainer>
-
-              <div className="grid grid-cols-3 gap-4 mt-6">
-                <div className="p-4 border border-border rounded-lg">
-                  <p className="text-sm text-muted-foreground mb-1">Total Revenue</p>
-                  <p className="text-2xl font-bold text-success">₹{analytics.totalRevenue.toFixed(2)}</p>
-                </div>
-                <div className="p-4 border border-border rounded-lg">
-                  <p className="text-sm text-muted-foreground mb-1">Total Expenses</p>
-                  <p className="text-2xl font-bold text-destructive">₹{analytics.totalExpenses.toFixed(2)}</p>
-                </div>
-                <div className="p-4 border border-border rounded-lg">
-                  <p className="text-sm text-muted-foreground mb-1">Net Profit</p>
-                  <p className={`text-2xl font-bold ${analytics.profit >= 0 ? 'text-success' : 'text-destructive'}`}>
-                    ₹{analytics.profit.toFixed(2)}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
 
         <TabsContent value="clients" className="space-y-4">
           <Card>
