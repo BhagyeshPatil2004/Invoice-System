@@ -2,11 +2,13 @@ import { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { User, Mail, Building, Phone, Save, Edit, X } from "lucide-react";
+import { User, Mail, Building, Phone, Save, Edit, X, CreditCard } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
+import { useData } from "@/contexts/DataContext";
 export default function Settings() {
   const { toast } = useToast();
+  const { bankDetails, setBankDetails } = useData();
   
   const [userDetails, setUserDetails] = useState({
     name: "John Doe",
@@ -16,6 +18,9 @@ export default function Settings() {
   });
   const [isEditing, setIsEditing] = useState(false);
   const [tempDetails, setTempDetails] = useState(userDetails);
+  
+  const [isBankEditing, setIsBankEditing] = useState(false);
+  const [tempBankDetails, setTempBankDetails] = useState(bankDetails);
   const handleEdit = () => {
     setTempDetails(userDetails);
     setIsEditing(true);
@@ -30,6 +35,25 @@ export default function Settings() {
     toast({
       title: "Settings saved",
       description: "Your settings have been updated successfully."
+    });
+  };
+
+  const handleBankEdit = () => {
+    setTempBankDetails(bankDetails);
+    setIsBankEditing(true);
+  };
+
+  const handleBankCancel = () => {
+    setTempBankDetails(bankDetails);
+    setIsBankEditing(false);
+  };
+
+  const handleBankSave = () => {
+    setBankDetails(tempBankDetails);
+    setIsBankEditing(false);
+    toast({
+      title: "Bank details saved",
+      description: "Your bank details will now be automatically added to all invoices."
     });
   };
   return <div className="space-y-6">
@@ -107,6 +131,90 @@ export default function Settings() {
                 Cancel
               </Button>
               <Button onClick={handleSave} className="gap-2">
+                <Save className="h-4 w-4" />
+                Save Changes
+              </Button>
+            </div>
+          </>}
+      </div>
+
+      <div className="rounded-lg border bg-card p-6 space-y-6">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <CreditCard className="h-6 w-6 text-primary" />
+            <div>
+              <h2 className="text-2xl font-semibold">Bank Details</h2>
+              <p className="text-sm text-muted-foreground">These details will be automatically added to all invoices</p>
+            </div>
+          </div>
+          {!isBankEditing && <Button onClick={handleBankEdit} variant="outline" size="sm" className="gap-2">
+              <Edit className="h-4 w-4" />
+              Edit
+            </Button>}
+        </div>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          <div className="space-y-2">
+            <Label className="text-base">Bank Name</Label>
+            {isBankEditing ? <Input 
+              value={tempBankDetails.bankName} 
+              onChange={e => setTempBankDetails({
+                ...tempBankDetails,
+                bankName: e.target.value
+              })} 
+              className="bg-background" 
+              placeholder="e.g., HDFC Bank"
+            /> : <p className="text-sm font-medium p-3 rounded-md bg-card border">{bankDetails.bankName || "Not set"}</p>}
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-base">Account Name</Label>
+            {isBankEditing ? <Input 
+              value={tempBankDetails.accountName} 
+              onChange={e => setTempBankDetails({
+                ...tempBankDetails,
+                accountName: e.target.value
+              })} 
+              className="bg-background"
+              placeholder="e.g., John Doe"
+            /> : <p className="text-sm font-medium p-3 rounded-md bg-card border">{bankDetails.accountName || "Not set"}</p>}
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-base">Account Number</Label>
+            {isBankEditing ? <Input 
+              value={tempBankDetails.accountNumber} 
+              onChange={e => setTempBankDetails({
+                ...tempBankDetails,
+                accountNumber: e.target.value
+              })} 
+              className="bg-background"
+              placeholder="e.g., 1234567890"
+            /> : <p className="text-sm font-medium p-3 rounded-md bg-card border">{bankDetails.accountNumber || "Not set"}</p>}
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-base">IFSC Code</Label>
+            {isBankEditing ? <Input 
+              value={tempBankDetails.ifscCode} 
+              onChange={e => setTempBankDetails({
+                ...tempBankDetails,
+                ifscCode: e.target.value
+              })} 
+              className="bg-background"
+              placeholder="e.g., HDFC0001234"
+            /> : <p className="text-sm font-medium p-3 rounded-md bg-card border">{bankDetails.ifscCode || "Not set"}</p>}
+          </div>
+        </div>
+
+        {isBankEditing && <>
+            <Separator />
+            <div className="flex justify-end gap-2">
+              <Button onClick={handleBankCancel} variant="outline" className="gap-2">
+                <X className="h-4 w-4" />
+                Cancel
+              </Button>
+              <Button onClick={handleBankSave} className="gap-2">
                 <Save className="h-4 w-4" />
                 Save Changes
               </Button>

@@ -19,6 +19,7 @@ interface InvoiceData {
     bankName: string;
     accountName: string;
     accountNumber: string;
+    ifscCode: string;
   };
   advancePayment?: number;
   balanceDue?: number;
@@ -45,9 +46,10 @@ export default function InvoiceTemplate({ invoice }: InvoiceTemplateProps) {
   
   // Get tax breakdown
   const getTaxLabel = () => {
-    const taxItem = items.find(item => item.taxType !== 'none');
-    if (taxItem) {
-      return `${taxItem.taxType.toUpperCase()} ${taxItem.taxRate}%`;
+    const taxItems = items.filter(item => item.taxType !== 'none');
+    if (taxItems.length > 0) {
+      const firstTax = taxItems[0];
+      return `Tax ${firstTax.taxRate}%`;
     }
     return 'Tax 0%';
   };
@@ -56,11 +58,7 @@ export default function InvoiceTemplate({ invoice }: InvoiceTemplateProps) {
   const advancePayment = invoice.advancePayment || 0;
   const balanceDue = total - advancePayment;
 
-  const bankDetails = invoice.bankDetails || {
-    bankName: "",
-    accountName: "",
-    accountNumber: ""
-  };
+  const bankDetails = invoice.bankDetails;
 
   return (
     <div className="w-full mx-auto bg-white shadow-lg" style={{ fontFamily: 'Arial, sans-serif', width: '210mm', minHeight: '297mm', padding: '20mm', display: 'flex', flexDirection: 'column' }}>
@@ -92,7 +90,7 @@ export default function InvoiceTemplate({ invoice }: InvoiceTemplateProps) {
           <div className="col-span-1 pl-4">DESCRIPTION</div>
           <div className="text-center">UNIT PRICE</div>
           <div className="text-center">QTY</div>
-          <div className="text-right pr-4">TOTAL</div>
+          <div className="text-right pr-4">AMOUNT</div>
         </div>
         {items.map((item, index) => (
           <div key={index} className="grid grid-cols-4 gap-4 py-4 border-b border-gray-200">
@@ -123,12 +121,13 @@ export default function InvoiceTemplate({ invoice }: InvoiceTemplateProps) {
         </div>
         
         {/* Bank Details */}
-        {bankDetails.bankName && (
+        {bankDetails && bankDetails.bankName && (
           <div className="mb-6">
             <h3 className="font-bold mb-2 text-gray-900">BANK DETAILS</h3>
-            <p className="text-sm text-gray-700">{bankDetails.bankName}</p>
+            <p className="text-sm text-gray-700">Bank: {bankDetails.bankName}</p>
             <p className="text-sm text-gray-700">Account Name: {bankDetails.accountName}</p>
             <p className="text-sm text-gray-700">Account No.: {bankDetails.accountNumber}</p>
+            {bankDetails.ifscCode && <p className="text-sm text-gray-700">IFSC Code: {bankDetails.ifscCode}</p>}
           </div>
         )}
         
