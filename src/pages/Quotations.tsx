@@ -74,8 +74,17 @@ export default function Quotations() {
 
       // If status changed to "accepted", create an invoice
       if (newStatus === 'accepted') {
+        // Generate sequential invoice number
+        const existingNumbers = invoices
+          .map(inv => {
+            const match = inv.id.match(/^INV-(\d+)$/);
+            return match ? parseInt(match[1]) : 0;
+          })
+          .filter(num => num > 0);
+        const nextNumber = existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
+        
         const newInvoice = {
-          id: `INV-${Date.now()}`,
+          id: `INV-${nextNumber}`,
           clientName: selectedQuotation.clientName,
           description: selectedQuotation.description,
           amount: selectedQuotation.amount,
