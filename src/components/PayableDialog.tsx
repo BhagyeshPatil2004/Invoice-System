@@ -24,40 +24,14 @@ export default function PayableDialog({ open, onOpenChange, onSave, payable }: P
     vendorName: payable?.vendorName || "",
     category: payable?.category || "Utilities",
     billAmount: payable?.billAmount || "",
-    amountPaid: payable?.amountPaid || "",
-    amountDue: payable?.amountDue || "",
     status: payable?.status || "pending",
     dueDate: payable?.dueDate || "",
   });
 
-  // Auto-update: Status changes affect Amount Paid
-  useEffect(() => {
-    if (formData.status === "paid" && formData.billAmount) {
-      const billAmount = parseFloat(formData.billAmount) || 0;
-      setFormData(prev => ({ ...prev, amountPaid: billAmount.toString() }));
-    } else if (formData.status === "pending") {
-      setFormData(prev => ({ ...prev, amountPaid: "0" }));
-    }
-  }, [formData.status]);
-
-  // Auto-update: If manually entering amounts and they match, set status to "paid"
-  useEffect(() => {
-    const billAmount = parseFloat(formData.billAmount) || 0;
-    const amountPaid = parseFloat(formData.amountPaid) || 0;
-    
-    // Only auto-update status if amounts match and status isn't already "paid"
-    if (billAmount > 0 && billAmount === amountPaid && formData.status !== "paid") {
-      setFormData(prev => ({ ...prev, status: "paid" }));
-    } else if (amountPaid === 0 && billAmount > 0 && formData.status === "paid") {
-      // If user clears amount paid, revert to pending
-      setFormData(prev => ({ ...prev, status: "pending" }));
-    }
-  }, [formData.billAmount, formData.amountPaid]);
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const billAmount = parseFloat(formData.billAmount) || 0;
-    const amountPaid = parseFloat(formData.amountPaid) || 0;
+    const amountPaid = formData.status === "paid" ? billAmount : 0;
     const amountDue = billAmount - amountPaid;
 
     onSave({
@@ -129,31 +103,19 @@ export default function PayableDialog({ open, onOpenChange, onSave, payable }: P
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="amountPaid">Amount Paid (₹)</Label>
-              <Input
-                id="amountPaid"
-                type="number"
-                value={formData.amountPaid}
-                onChange={(e) => setFormData({ ...formData, amountPaid: e.target.value })}
-                placeholder="0"
-              />
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="status">Status</Label>
-              <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="pending">Pending</SelectItem>
-                  <SelectItem value="partial">Partial</SelectItem>
-                  <SelectItem value="paid">Paid</SelectItem>
-                  <SelectItem value="overdue">Overdue</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="status">Status</Label>
+            <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="partial">Partial</SelectItem>
+                <SelectItem value="paid">Paid</SelectItem>
+                <SelectItem value="overdue">Overdue</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-2">

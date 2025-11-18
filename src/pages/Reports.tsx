@@ -173,12 +173,12 @@ export default function Reports() {
         <Card className="hover:shadow-md transition-shadow">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 rounded-lg bg-success/10">
+              <div className="p-2 rounded-lg bg-success/10 shrink-0">
                 <DollarSign className="h-5 w-5 text-success" />
               </div>
-              <div>
+              <div className="min-w-0 flex-1">
                 <p className="text-sm text-muted-foreground">Revenue</p>
-                <div className="text-2xl font-bold text-foreground">₹{analytics.totalRevenue.toFixed(2)}</div>
+                <div className="text-2xl font-bold text-foreground break-all">₹{analytics.totalRevenue.toFixed(2)}</div>
               </div>
             </div>
             <div className="text-sm text-success">From paid invoices</div>
@@ -188,12 +188,12 @@ export default function Reports() {
         <Card className="hover:shadow-md transition-shadow">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 rounded-lg bg-destructive/10">
+              <div className="p-2 rounded-lg bg-destructive/10 shrink-0">
                 <TrendingUp className="h-5 w-5 text-destructive" />
               </div>
-              <div>
+              <div className="min-w-0 flex-1">
                 <p className="text-sm text-muted-foreground">Expenses</p>
-                <div className="text-2xl font-bold text-foreground">₹{analytics.totalExpenses.toFixed(2)}</div>
+                <div className="text-2xl font-bold text-foreground break-all">₹{analytics.totalExpenses.toFixed(2)}</div>
               </div>
             </div>
             <div className="text-sm text-destructive">From paid bills</div>
@@ -203,12 +203,12 @@ export default function Reports() {
         <Card className="hover:shadow-md transition-shadow">
           <CardContent className="pt-6">
             <div className="flex items-center gap-3 mb-2">
-              <div className="p-2 rounded-lg bg-primary/10">
+              <div className="p-2 rounded-lg bg-primary/10 shrink-0">
                 <DollarSign className="h-5 w-5 text-primary" />
               </div>
-              <div>
+              <div className="min-w-0 flex-1">
                 <p className="text-sm text-muted-foreground">Profit</p>
-                <div className={`text-2xl font-bold ${analytics.profit >= 0 ? 'text-success' : 'text-destructive'}`}>
+                <div className={`text-2xl font-bold break-all ${analytics.profit >= 0 ? 'text-success' : 'text-destructive'}`}>
                   ₹{analytics.profit.toFixed(2)}
                 </div>
               </div>
