@@ -339,10 +339,7 @@ export default function Invoices() {
                 {filteredInvoices.map((invoice) => (
                   <TableRow key={invoice.id} className="hover:bg-accent/50 transition-colors">
                     <TableCell>
-                      <div>
-                        <div className="font-medium text-foreground">{invoice.id}</div>
-                        <div className="text-sm text-muted-foreground">{invoice.description}</div>
-                      </div>
+                      <div className="font-medium text-foreground">{invoice.id}</div>
                     </TableCell>
                     <TableCell>
                       <div className="font-medium text-foreground">{invoice.clientName}</div>
