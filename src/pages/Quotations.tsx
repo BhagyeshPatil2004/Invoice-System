@@ -23,7 +23,8 @@ const getStatusBadge = (status: string) => {
 export default function Quotations() {
   const {
     invoices,
-    setInvoices
+    setInvoices,
+    bankDetails
   } = useData();
   const [quotations, setQuotations] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -86,11 +87,12 @@ export default function Quotations() {
         const newInvoice = {
           id: `INV-${nextNumber}`,
           clientName: selectedQuotation.clientName,
-          description: selectedQuotation.description,
           amount: selectedQuotation.amount,
           status: 'pending',
           issueDate: new Date().toISOString().split('T')[0],
-          dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] // 30 days from now
+          dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days from now
+          lineItems: selectedQuotation.lineItems || [],
+          bankDetails: bankDetails
         };
         setInvoices([...invoices, newInvoice]);
         toast({
