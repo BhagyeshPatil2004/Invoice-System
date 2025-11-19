@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Plus, Search, MoreHorizontal, Download, FileText, Trash2, Edit } from "lucide-react";
+import { Plus, Search, MoreHorizontal, Download, FileText, Trash2, Edit, Eye } from "lucide-react";
 import QuotationDialog from "@/components/QuotationDialog";
+import QuotationTemplate from "@/components/QuotationTemplate";
 import { useData } from "@/contexts/DataContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -31,6 +32,7 @@ export default function Quotations() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [statusDialogOpen, setStatusDialogOpen] = useState(false);
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
   const [selectedQuotation, setSelectedQuotation] = useState<any>(null);
   const [newStatus, setNewStatus] = useState<string>("");
   const {
@@ -59,6 +61,11 @@ export default function Quotations() {
       title: "Download Started",
       description: `Downloading quotation ${quotation.id}`
     });
+  };
+
+  const handleViewClick = (quotation: any) => {
+    setSelectedQuotation(quotation);
+    setViewDialogOpen(true);
   };
   const handleStatusClick = (quotation: any) => {
     setSelectedQuotation(quotation);
@@ -206,6 +213,10 @@ export default function Quotations() {
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end" className="w-48">
+                          <DropdownMenuItem onClick={() => handleViewClick(quote)}>
+                            <Eye className="h-4 w-4 mr-2" />
+                            View Quotation
+                          </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleStatusClick(quote)}>
                             <Edit className="h-4 w-4 mr-2" />
                             Change Status
@@ -281,6 +292,37 @@ export default function Quotations() {
             <AlertDialogAction onClick={handleDeleteConfirm} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
               Delete
             </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* View Quotation Dialog */}
+      <AlertDialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
+        <AlertDialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Quotation Preview</AlertDialogTitle>
+            <AlertDialogDescription>
+              View and download quotation {selectedQuotation?.id}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <div className="py-4">
+            {selectedQuotation && (
+              <QuotationTemplate quotation={selectedQuotation} />
+            )}
+          </div>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Close</AlertDialogCancel>
+            <Button onClick={() => {
+              handleDownload(selectedQuotation);
+              toast({
+                title: "Download Ready",
+                description: "Your quotation is ready to download"
+              });
+            }}>
+              <Download className="h-4 w-4 mr-2" />
+              Download PDF
+            </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
