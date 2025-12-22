@@ -1,71 +1,278 @@
-# Welcome to your Lovable project
+## 📄 Invoice Management System
 
-## Project info
+A modern, web-based Invoice Management System designed to digitalize, automate, and streamline billing workflows for small and medium-scale businesses (SMEs).
+This project replaces manual and spreadsheet-based invoicing with a structured, secure, and analytics-driven solution.
 
-## How can I edit this code?
+🚀 Project Overview
 
-There are several ways of editing your application.
+The Invoice Management System is a full-stack web application that enables businesses to:
 
-**Use Lovable**
+Create and manage professional invoices
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/581e17be-1bc5-4e5c-8512-f8f5fcfbf6f0) and start prompting.
+Maintain centralized customer and inventory records
 
-Changes made via Lovable will be committed automatically to this repo.
+Automate tax and total calculations
 
-**Use your preferred IDE**
+Track payments and outstanding dues
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+Visualize financial performance via dashboards and reports
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+The system is designed with simplicity, accuracy, scalability, and usability in mind—making it ideal for freelancers, startups, and SMEs.
 
-Follow these steps:
+🎯 Motivation
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+Many small businesses still rely on:
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+Paper invoices
 
-# Step 3: Install the necessary dependencies.
-npm i
+Excel spreadsheets
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+Static document templates
 
-**Edit a file directly in GitHub**
+These approaches lead to:
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+Calculation errors
 
-**Use GitHub Codespaces**
+Disorganized records
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+Poor payment tracking
 
-## What technologies are used for this project?
+Lack of financial insights
 
-This project is built with:
+This project addresses these problems by providing:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+A centralized invoice platform
 
-## How can I deploy this project?
+Automated calculations
 
-Simply open [Lovable](https://lovable.dev/projects/581e17be-1bc5-4e5c-8512-f8f5fcfbf6f0) and click on Share -> Publish.
+Real-time analytics
 
-## Can I connect a custom domain to my Lovable project?
+Professional invoice generation
 
-Yes, you can!
+🧩 Problem Statement
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+There is a need for a centralized, user-friendly Invoice Management System that automates invoice creation, maintains organized customer and transaction records, enables real-time payment tracking, and generates meaningful financial reports to support effective decision-making for SMEs.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+✨ Key Features
+🔐 Authentication & Security
+
+Secure user authentication (Email + Password)
+
+Session management
+
+Row-Level Security (RLS) for data isolation
+
+🧾 Invoice Management
+
+Create, update, delete invoices
+
+Multiple line items per invoice
+
+Automatic subtotal, tax, and total calculation
+
+Invoice status tracking: Paid | Pending | Overdue
+
+Search & filter invoices
+
+👥 Client Management
+
+Centralized client directory
+
+Client-wise invoice history
+
+Outstanding balance tracking
+
+Client health score evaluation
+
+📦 Inventory Management
+
+Product/service catalog
+
+Auto-selection during invoice creation
+
+Real-time inventory synchronization
+
+🧮 Automated Tax Calculation
+
+Configurable tax rates
+
+Error-free, consistent tax computation
+
+📄 PDF Invoice Generation
+
+Professional A4 invoice PDFs
+
+Download & share directly
+
+📊 Dashboard & Analytics
+
+Total revenue
+
+Outstanding & overdue payments
+
+Monthly trends
+
+Financial summaries
+
+🟢 Client Health Score
+
+Evaluates reliability based on payment behavior
+
+Categorized as Good / Average / Poor
+
+🏗️ System Architecture
+
+The system follows a web-based client–server architecture:
+
+Frontend (SPA)
+   |
+   |  REST / Realtime APIs
+   |
+Supabase (PostgreSQL + Auth + RLS)
+
+
+Frontend: User interface, validation, dashboards
+
+Backend (BaaS): Authentication, database, APIs
+
+Database: Relational (PostgreSQL), ACID-compliant
+
+🛠️ Tech Stack
+Frontend
+
+React
+
+TypeScript
+
+Tailwind CSS
+
+Modern SPA architecture
+
+Backend / Database
+
+Supabase (PostgreSQL)
+
+Row Level Security (RLS)
+
+Realtime subscriptions
+
+JWT-based authentication
+
+Tools & DevOps
+
+Git & GitHub
+
+Visual Studio Code
+
+Docker (optional)
+
+PDF generation libraries
+
+⚙️ Functional Requirements (Summary)
+
+User authentication & authorization
+
+Invoice CRUD operations
+
+Client & inventory management
+
+Automated tax & total calculations
+
+PDF invoice export
+
+Financial dashboards
+
+Search & filter functionality
+
+Client reliability scoring
+
+📈 Non-Functional Requirements
+
+High performance & low latency
+
+Scalability for growing businesses
+
+Secure data handling (HTTPS, encryption)
+
+Cross-platform browser compatibility
+
+Maintainable and modular architecture
+
+🧠 Core Algorithms Used
+Algorithm	Purpose	Time Complexity
+Invoice Calculation	Subtotal, tax & total	O(n)
+Invoice Search & Filter	Real-time filtering	O(n)
+Client Health Score	Payment reliability	O(1)
+Invoice Status Detection	Paid / Overdue	O(1)
+Inventory Sync	Stock consistency	O(n)
+Dashboard Aggregation	Financial metrics	O(n)
+PDF Generation	Invoice export	O(n)
+🖼️ Application Screens (Implemented)
+
+Sign In / Sign Up
+
+Client Management
+
+Invoice Creation
+
+Invoice Preview
+
+Payments & Dues
+
+Reports & Analytics
+
+Notifications
+
+Settings
+
+Supabase Database View
+
+🏁 Results & Conclusion
+
+The system successfully demonstrates:
+
+Reduction in manual errors
+
+Faster invoice creation
+
+Improved financial transparency
+
+Better cash-flow tracking
+
+Professional documentation standards
+
+It proves that modern web technologies + structured data handling can deliver a cost-effective alternative to heavyweight accounting software.
+
+🔮 Future Scope
+
+🔗 Payment Gateway Integration (Razorpay, Stripe, PayPal)
+
+🇮🇳 GST & e-Invoicing Compliance
+
+📱 Mobile Applications (Android / iOS)
+
+📊 Advanced Analytics & Forecasting
+
+🤖 AI-based OCR & Invoice Parsing
+
+🔐 Role-Based Access Control
+
+🌍 Multi-Currency & Localization Support
+
+🔄 Integration with Tally / Zoho / QuickBooks
+
+📚 References
+
+This project is supported by:
+
+Academic research (IEEE, MIS Quarterly)
+
+Industry platforms (SAP, Zoho, QuickBooks)
+
+Modern web documentation (React, TypeScript, Supabase)
+
+A complete reference list is included in the project report.
+
+👤 Author
+
+Bhagyesh Rajendra Patil
