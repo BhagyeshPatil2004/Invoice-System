@@ -20,7 +20,8 @@ interface PayableDialogProps {
 
 export default function PayableDialog({ open, onOpenChange, onSave, payable }: PayableDialogProps) {
   const [formData, setFormData] = useState({
-    id: payable?.id || "",
+    id: payable?.id || "", // UUID from Supabase (hidden)
+    billId: payable?.billId || "",
     vendorName: payable?.vendorName || "",
     category: payable?.category || "Utilities",
     billAmount: payable?.billAmount || "",
@@ -52,11 +53,11 @@ export default function PayableDialog({ open, onOpenChange, onSave, payable }: P
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="id">Bill ID</Label>
+              <Label htmlFor="billId">Bill ID</Label>
               <Input
-                id="id"
-                value={formData.id}
-                onChange={(e) => setFormData({ ...formData, id: e.target.value })}
+                id="billId"
+                value={formData.billId}
+                onChange={(e) => setFormData({ ...formData, billId: e.target.value })}
                 placeholder="BILL-001"
                 required
               />

@@ -2,127 +2,125 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Invoice Management System Design System - Professional Financial Application */
+/* Premium Invoice Management System Design System */
 
 @layer base {
   :root {
-    /* Core Brand Colors - Professional Blue Palette */
-    --background: 0 0% 100%;
-    --foreground: 215 25% 27%;
+    /* Core Brand Colors - Clean & Professional Light Mode */
+    --background: 210 40% 98%;
+    /* Soft Slate White */
+    --foreground: 222 47% 11%;
+    /* Deep Slate */
 
     --card: 0 0% 100%;
-    --card-foreground: 215 25% 27%;
+    --card-foreground: 222 47% 11%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 215 25% 27%;
+    --popover-foreground: 222 47% 11%;
 
-    /* Primary - Professional Blue for Trust & Reliability */
-    --primary: 213 94% 68%;
-    --primary-foreground: 0 0% 100%;
-    --primary-muted: 213 94% 68% / 0.1;
-    --primary-hover: 213 94% 58%;
+    /* Primary - Vibrant Indigo for Modern Tech Feel */
+    --primary: 245 58% 51%;
+    /* Indigo 600 */
+    --primary-foreground: 210 40% 98%;
+    --primary-muted: 245 58% 51% / 0.1;
+    --primary-hover: 245 58% 45%;
 
     /* Financial Status Colors */
-    --success: 142 76% 36%;
+    --success: 150 100% 35%;
+    /* Emerald 600 */
     --success-foreground: 0 0% 100%;
-    --success-muted: 142 76% 36% / 0.1;
-    
-    --warning: 38 92% 50%;
+
+    --warning: 35 100% 50%;
+    /* Amber 500 */
     --warning-foreground: 0 0% 100%;
-    --warning-muted: 38 92% 50% / 0.1;
-    
+
     --danger: 0 84% 60%;
+    /* Rose 500 */
     --danger-foreground: 0 0% 100%;
-    --danger-muted: 0 84% 60% / 0.1;
 
     /* UI Elements */
     --secondary: 210 40% 96%;
-    --secondary-foreground: 215 25% 27%;
+    --secondary-foreground: 222 47% 11%;
 
     --muted: 210 40% 96%;
-    --muted-foreground: 215 20% 65%;
+    --muted-foreground: 215 16% 47%;
 
-    --accent: 213 94% 68% / 0.05;
-    --accent-foreground: 215 25% 27%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive-foreground: 210 40% 98%;
 
     --border: 214 32% 91%;
     --input: 214 32% 91%;
-    --ring: 213 94% 68%;
+    --ring: 245 58% 51%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
+    /* More rounded corners */
 
-    /* Professional Gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(213 94% 68%), hsl(213 94% 58%));
-    --gradient-success: linear-gradient(135deg, hsl(142 76% 36%), hsl(142 76% 46%));
-    --gradient-card: linear-gradient(135deg, hsl(0 0% 100%), hsl(0 0% 99%));
-    
-    /* Professional Shadows */
-    --shadow-card: 0 1px 3px 0 hsl(215 25% 27% / 0.1), 0 1px 2px -1px hsl(215 25% 27% / 0.1);
-    --shadow-lg: 0 10px 15px -3px hsl(215 25% 27% / 0.1), 0 4px 6px -4px hsl(215 25% 27% / 0.1);
-    --shadow-primary: 0 4px 14px 0 hsl(213 94% 68% / 0.25);
-
-    /* Sidebar Colors for Invoice System */
-    --sidebar-background: 215 25% 27%;
-    --sidebar-foreground: 0 0% 100%;
-    --sidebar-primary: 213 94% 68%;
+    /* Sidebar Colors */
+    --sidebar-background: 222 47% 11%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 245 58% 51%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 215 25% 35%;
-    --sidebar-accent-foreground: 0 0% 100%;
-    --sidebar-border: 215 25% 35%;
-    --sidebar-ring: 213 94% 68%;
+    --sidebar-accent: 217 33% 17%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 33% 17%;
+    --sidebar-ring: 224 76% 48%;
   }
 
   .dark {
-    /* Dark mode optimized for financial applications */
-    --background: 215 25% 10%;
-    --foreground: 0 0% 98%;
+    /* Premium Dark Mode - Abyssal Purple Aesthetic */
+    /* Base: Very Deep Purple (Almost Black with Purple Tint) */
+    --background: 282 85% 5%;
+    --foreground: 210 40% 98%;
 
-    --card: 215 25% 15%;
-    --card-foreground: 0 0% 98%;
+    /* Cards: Deep purple, slightly distinct from bg */
+    --card: 282 60% 9%;
+    --card-foreground: 210 40% 98%;
 
-    --popover: 215 25% 15%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 282 60% 9%;
+    --popover-foreground: 210 40% 98%;
 
-    --primary: 213 94% 68%;
-    --primary-foreground: 215 25% 10%;
-    --primary-hover: 213 94% 58%;
+    /* Primary: Electric Violet - High contrast against dark bg */
+    --primary: 265 89% 68%;
+    --primary-foreground: 210 40% 98%;
+    --primary-hover: 265 89% 58%;
 
-    --success: 142 76% 46%;
-    --success-foreground: 215 25% 10%;
-    
-    --warning: 38 92% 60%;
-    --warning-foreground: 215 25% 10%;
-    
-    --danger: 0 84% 60%;
-    --danger-foreground: 0 0% 98%;
+    --success: 150 100% 40%;
+    --success-foreground: 282 85% 5%;
 
-    --secondary: 215 25% 20%;
-    --secondary-foreground: 0 0% 98%;
+    --warning: 35 100% 60%;
+    --warning-foreground: 282 85% 5%;
 
-    --muted: 215 25% 20%;
-    --muted-foreground: 215 20% 70%;
+    --danger: 0 84% 65%;
+    --danger-foreground: 210 40% 98%;
 
-    --accent: 213 94% 68% / 0.1;
-    --accent-foreground: 0 0% 98%;
+    --secondary: 282 40% 15%;
+    --secondary-foreground: 210 40% 98%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
+    --muted: 282 40% 15%;
+    --muted-foreground: 282 20% 65%;
 
-    --border: 215 25% 25%;
-    --input: 215 25% 25%;
-    --ring: 213 94% 68%;
-    
-    --sidebar-background: 215 25% 5%;
-    --sidebar-foreground: 0 0% 95%;
-    --sidebar-primary: 213 94% 68%;
-    --sidebar-primary-foreground: 215 25% 5%;
-    --sidebar-accent: 215 25% 15%;
-    --sidebar-accent-foreground: 0 0% 95%;
-    --sidebar-border: 215 25% 15%;
-    --sidebar-ring: 213 94% 68%;
+    --accent: 282 40% 15%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 282 40% 15%;
+    --input: 282 40% 15%;
+    --ring: 265 89% 68%;
+
+    /* Sidebar: The darkest element */
+    --sidebar-background: 282 90% 4%;
+    --sidebar-foreground: 210 40% 95%;
+    --sidebar-primary: 265 89% 68%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 282 50% 12%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 282 50% 12%;
+    --sidebar-ring: 265 89% 68%;
   }
 }
 
@@ -131,14 +129,149 @@
     @apply border-border;
   }
 
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Outfit', system-ui, sans-serif;
+    letter-spacing: -0.025em;
+  }
+
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased selection:bg-primary/20 selection:text-primary;
   }
 }
 
 @layer utilities {
-  /* Hover Scale Animation */
+
+  /* Glassmorphism */
+  .glass {
+    @apply bg-white/10 backdrop-blur-md border border-white/10 shadow-lg;
+  }
+
+  .glass-card {
+    @apply bg-card/80 backdrop-blur-sm border border-border shadow-sm hover:shadow-md transition-all duration-300;
+  }
+
+  /* Animations */
+  .animate-fade-in {
+    animation: fadeIn 0.5s ease-out forwards;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.5s ease-out forwards;
+  }
+
   .hover-scale {
-    @apply transition-transform duration-200 ease-out hover:scale-105;
+    @apply transition-transform duration-200 ease-out hover:scale-[1.02] active:scale-[0.98];
+  }
+
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-purple-400;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes blob {
+  0% {
+    transform: translate(0px, 0px) scale(1);
+  }
+
+  33% {
+    transform: translate(30px, -50px) scale(1.1);
+  }
+
+  66% {
+    transform: translate(-20px, 20px) scale(0.9);
+  }
+
+  100% {
+    transform: translate(0px, 0px) scale(1);
+  }
+}
+
+.animate-blob {
+  animation: blob 7s infinite;
+}
+
+.animation-delay-2000 {
+  animation-delay: 2s;
+}
+
+.animation-delay-4000 {
+  animation-delay: 4s;
+}
+
+/* Modern UI Overhaul Utilities */
+@layer utilities {
+  .glass-panel {
+    @apply bg-black/20 backdrop-blur-xl border border-white/10 shadow-2xl;
+  }
+
+  .neon-border {
+    @apply border border-primary/50;
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
+  }
+
+  .hover-glow {
+    @apply transition-all duration-300;
+  }
+
+  .hover-glow:hover {
+    @apply border-primary/50;
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+  }
+
+  /* Text Glow */
+  .text-glow {
+    text-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+  }
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-white/10 rounded-full hover:bg-white/20 transition-colors;
+}
+
+/* Base override for slightly translucent cards */
+@layer base {
+  .card-translucent {
+    @apply bg-card/60 backdrop-blur-md border-white/5;
   }
 }

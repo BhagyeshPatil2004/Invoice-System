@@ -25,12 +25,12 @@ export function NotificationDialog({ open, onOpenChange }: NotificationDialogPro
     }
   };
 
-  // Filter for upcoming pending invoices (within next 7 days)
+  // Filter for upcoming pending invoices (within next 7 days OR overdue)
   const upcomingReceivables = invoices.filter(invoice => {
     if (invoice.status === 'paid') return false; // Exclude paid invoices
     try {
       const dueDate = parseDate(invoice.dueDate);
-      return isWithinInterval(dueDate, { start: today, end: nextWeek });
+      return isWithinInterval(dueDate, { start: today, end: nextWeek }) || dueDate < today;
     } catch {
       return false;
     }
@@ -42,12 +42,12 @@ export function NotificationDialog({ open, onOpenChange }: NotificationDialogPro
     status: invoice.status
   }));
 
-  // Filter for upcoming pending payables (within next 7 days)
+  // Filter for upcoming pending payables (within next 7 days OR overdue)
   const upcomingPayables = payables.filter(payable => {
     if (payable.status === 'paid' || payable.amountDue === 0) return false; // Exclude fully paid
     try {
       const dueDate = parseDate(payable.dueDate);
-      return isWithinInterval(dueDate, { start: today, end: nextWeek });
+      return isWithinInterval(dueDate, { start: today, end: nextWeek }) || dueDate < today;
     } catch {
       return false;
     }
@@ -71,11 +71,11 @@ export function NotificationDialog({ open, onOpenChange }: NotificationDialogPro
         <DialogHeader>
           <DialogTitle>Notifications</DialogTitle>
           <DialogDescription>
-            Due dates within the next 7 days
+            Overdue or due within the next 7 days
           </DialogDescription>
         </DialogHeader>
-        
-        <ScrollArea className="flex-1 pr-4 overflow-y-auto"  style={{ maxHeight: "calc(85vh - 120px)" }}>
+
+        <ScrollArea className="flex-1 pr-4 overflow-y-auto" style={{ maxHeight: "calc(85vh - 120px)" }}>
           <div className="space-y-6">
             {/* Receivables Section */}
             <div>
@@ -84,7 +84,7 @@ export function NotificationDialog({ open, onOpenChange }: NotificationDialogPro
                 <h3 className="font-semibold text-lg">Customer Payments Due</h3>
                 <Badge variant="secondary">{upcomingReceivables.length}</Badge>
               </div>
-              
+
               {upcomingReceivables.length === 0 ? (
                 <p className="text-sm text-muted-foreground pl-7">No upcoming receivables</p>
               ) : (
@@ -122,7 +122,7 @@ export function NotificationDialog({ open, onOpenChange }: NotificationDialogPro
                 <h3 className="font-semibold text-lg">Your Payments Due</h3>
                 <Badge variant="secondary">{upcomingPayables.length}</Badge>
               </div>
-              
+
               {upcomingPayables.length === 0 ? (
                 <p className="text-sm text-muted-foreground pl-7">No upcoming payables</p>
               ) : (

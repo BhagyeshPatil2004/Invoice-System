@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, Trash2, Percent } from "lucide-react";
 import {
   Dialog,
@@ -20,6 +20,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { Separator } from "@/components/ui/separator";
+import { useData } from "@/contexts/DataContext";
 
 interface InvoiceDialogProps {
   open: boolean;
@@ -41,8 +42,31 @@ type TaxRate = 0 | 5 | 12 | 18 | 28;
 
 export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: InvoiceDialogProps) {
   const { toast } = useToast();
+  const { bankDetails: savedBankDetails, products, invoices } = useData(); // Added invoices from context
   const [clientId, setClientId] = useState("");
-  const [invoiceNumber, setInvoiceNumber] = useState(`INV-${Math.floor(Math.random() * 1000).toString().padStart(3, '0')}`);
+  const [invoiceNumber, setInvoiceNumber] = useState("");
+
+  // Generate next invoice number when dialog opens
+  useEffect(() => {
+    if (open) {
+      if (invoices.length === 0) {
+        setInvoiceNumber("INV-001");
+      } else {
+        // Extract numbers from existing IDs (assuming format INV-XXX)
+        const maxNum = invoices.reduce((max, inv) => {
+          const match = inv.id.match(/INV-(\d+)/);
+          if (match) {
+            const num = parseInt(match[1]);
+            return num > max ? num : max;
+          }
+          return max;
+        }, 0);
+
+        setInvoiceNumber(`INV-${(maxNum + 1).toString().padStart(3, '0')}`);
+      }
+    }
+  }, [open, invoices]);
+
   const [issueDate, setIssueDate] = useState(new Date().toISOString().split('T')[0]);
   const [dueDate, setDueDate] = useState("");
   const [notes, setNotes] = useState("");
@@ -73,6 +97,19 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
     ));
   };
 
+  const handleProductSelect = (id: string, productId: string) => {
+    const product = products.find(p => p.id === productId);
+    if (product) {
+      setLineItems(lineItems.map(item =>
+        item.id === id ? {
+          ...item,
+          description: product.description ? `${product.name} - ${product.description}` : product.name,
+          rate: product.price
+        } : item
+      ));
+    }
+  };
+
   const calculateItemTotal = (item: LineItem) => {
     const subtotal = item.quantity * item.rate;
     return subtotal;
@@ -98,7 +135,7 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
 
   const getTaxBreakdown = () => {
     const breakdown: { [key: string]: number } = {};
-    
+
     lineItems.forEach(item => {
       if (item.taxType !== 'none') {
         const key = `${item.taxType.toUpperCase()} ${item.taxRate}%`;
@@ -106,9 +143,17 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
         breakdown[key] = (breakdown[key] || 0) + tax;
       }
     });
-    
+
     return breakdown;
   };
+
+  useEffect(() => {
+    if (open) {
+      setBankName(savedBankDetails.bankName || "");
+      setAccountName(savedBankDetails.accountName || "");
+      setAccountNumber(savedBankDetails.accountNumber || "");
+    }
+  }, [open, savedBankDetails]);
 
   const resetForm = () => {
     setClientId("");
@@ -117,15 +162,15 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
     setDueDate("");
     setNotes("");
     setLineItems([{ id: "1", description: "", quantity: 1, rate: 0, taxType: 'none', taxRate: 0 }]);
-    setBankName("");
-    setAccountName("");
-    setAccountNumber("");
+    setBankName(savedBankDetails.bankName || "");
+    setAccountName(savedBankDetails.accountName || "");
+    setAccountNumber(savedBankDetails.accountNumber || "");
     setAdvancePayment(0);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validation
     if (!clientId) {
       toast({
@@ -138,7 +183,7 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
 
     if (!dueDate) {
       toast({
-        title: "Error", 
+        title: "Error",
         description: "Please set a due date",
         variant: "destructive",
       });
@@ -159,8 +204,17 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
     const balanceDue = grandTotal - advancePayment;
     const status = advancePayment >= grandTotal ? "paid" : advancePayment > 0 ? "pending" : "pending";
 
+    const mergedBankDetails = {
+      bankName: bankName || savedBankDetails.bankName || "",
+      accountName: accountName || savedBankDetails.accountName || "",
+      accountNumber: accountNumber || savedBankDetails.accountNumber || "",
+      ifscCode: savedBankDetails.ifscCode || "",
+    };
+    const hasBankInfo = Object.values(mergedBankDetails).some(value => value);
+
     const newInvoice = {
-      id: invoiceNumber,
+      // id: invoiceNumber, // Remove ID to let Supabase generate UUID
+      invoiceNumber, // Add invoiceNumber explicitly
       clientId,
       clientName: clientId,
       description: lineItems[0]?.description || "Invoice",
@@ -170,11 +224,7 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
       dueDate,
       notes,
       lineItems,
-      bankDetails: bankName ? {
-        bankName,
-        accountName,
-        accountNumber,
-      } : undefined,
+      bankDetails: hasBankInfo ? mergedBankDetails : undefined,
       advancePayment,
       balanceDue,
     };
@@ -185,7 +235,7 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
       title: "Invoice Created Successfully",
       description: `Invoice ${invoiceNumber} has been created for ₹${calculateGrandTotal().toFixed(2)}`,
     });
-    
+
     resetForm();
     onOpenChange(false);
   };
@@ -268,8 +318,26 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
                 <div key={item.id} className="p-4 border border-border rounded-lg space-y-3 bg-card hover:border-primary/50 transition-colors animate-fade-in">
                   {/* First Row: Description, Qty, Rate */}
                   <div className="grid grid-cols-12 gap-3">
-                    <div className="col-span-5">
-                      <Label htmlFor={`desc-${item.id}`} className="text-xs text-muted-foreground">Description</Label>
+                    <div className="col-span-12 md:col-span-5">
+                      <div className="flex justify-between items-center mb-1">
+                        <Label htmlFor={`desc-${item.id}`} className="text-xs text-muted-foreground">Description</Label>
+                        {products && products.length > 0 && (
+                          <div className="w-[140px]">
+                            <Select onValueChange={(value) => handleProductSelect(item.id, value)}>
+                              <SelectTrigger className="h-7 text-xs">
+                                <SelectValue placeholder="Load Product..." />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {products.map((p: any) => (
+                                  <SelectItem key={p.id} value={p.id}>
+                                    {p.name} - ₹{p.price}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        )}
+                      </div>
                       <Input
                         id={`desc-${item.id}`}
                         placeholder="Item or service description"
@@ -328,8 +396,8 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
                         <Percent className="h-3 w-3" />
                         Tax Type
                       </Label>
-                      <Select 
-                        value={item.taxType} 
+                      <Select
+                        value={item.taxType}
                         onValueChange={(value: TaxType) => {
                           updateLineItem(item.id, 'taxType', value);
                           if (value === 'none') {
@@ -352,8 +420,8 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
                       <>
                         <div className="col-span-3">
                           <Label htmlFor={`tax-rate-${item.id}`} className="text-xs text-muted-foreground">Tax Rate</Label>
-                          <Select 
-                            value={item.taxRate.toString()} 
+                          <Select
+                            value={item.taxRate.toString()}
                             onValueChange={(value) => updateLineItem(item.id, 'taxRate', parseInt(value))}
                           >
                             <SelectTrigger id={`tax-rate-${item.id}`} className="mt-1">
@@ -389,14 +457,14 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
 
           {/* Totals Section */}
           <Separator className="my-4" />
-          
+
           <div className="flex justify-end animate-fade-in">
             <div className="w-80 space-y-3 bg-muted/30 p-6 rounded-lg border border-border">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Subtotal:</span>
                 <span className="font-semibold text-foreground">₹{calculateSubtotal().toFixed(2)}</span>
               </div>
-              
+
               {/* Tax Breakdown */}
               {Object.entries(getTaxBreakdown()).map(([taxLabel, amount]) => (
                 <div key={taxLabel} className="flex justify-between text-sm">
@@ -407,21 +475,21 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
                   <span className="font-semibold text-warning">₹{amount.toFixed(2)}</span>
                 </div>
               ))}
-              
+
               {calculateTotalTax() === 0 && (
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Tax:</span>
                   <span className="font-semibold text-muted-foreground">₹0.00</span>
                 </div>
               )}
-              
+
               <Separator />
-              
+
               <div className="flex justify-between items-center pt-2">
                 <span className="text-base font-bold text-foreground">Grand Total:</span>
                 <span className="text-2xl font-bold text-primary">₹{calculateGrandTotal().toFixed(2)}</span>
               </div>
-              
+
               {calculateTotalTax() > 0 && (
                 <div className="text-xs text-muted-foreground text-right">
                   (Includes ₹{calculateTotalTax().toFixed(2)} in taxes)
@@ -446,7 +514,7 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
 
           {/* Bank Details */}
           <Separator className="my-4" />
-          
+
           <div className="space-y-4">
             <Label className="text-base font-semibold">Bank Details (Optional)</Label>
             <div className="grid grid-cols-3 gap-4">
@@ -494,7 +562,7 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
 
           {/* Actions */}
           <Separator className="my-4" />
-          
+
           <div className="flex justify-between items-end gap-6">
             <div className="flex-1 space-y-2">
               <Label htmlFor="advancePayment" className="text-base font-semibold">Advance Payment (Optional)</Label>
@@ -523,9 +591,9 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
             </div>
 
             <div className="flex gap-3">
-              <Button 
-                type="button" 
-                variant="outline" 
+              <Button
+                type="button"
+                variant="outline"
                 onClick={() => {
                   resetForm();
                   onOpenChange(false);

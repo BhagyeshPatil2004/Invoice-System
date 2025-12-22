@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Plus, Search, MoreHorizontal, Download, FileText, Trash2, Edit, Eye } from "lucide-react";
 import QuotationDialog from "@/components/QuotationDialog";
 import QuotationTemplate from "@/components/QuotationTemplate";
@@ -12,6 +12,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
+import { exportElementAsPDF } from "@/lib/pdf";
+import { supabase } from "@/supabaseClient";
+
 const getStatusBadge = (status: string) => {
   const variants = {
     accepted: "bg-success/10 text-success border-success/20",
@@ -21,11 +24,14 @@ const getStatusBadge = (status: string) => {
   };
   return variants[status as keyof typeof variants] || variants.draft;
 };
+
 export default function Quotations() {
   const {
     invoices,
     setInvoices,
-    bankDetails
+    bankDetails,
+    clients,
+    setClients
   } = useData();
   const [quotations, setQuotations] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -38,15 +44,88 @@ export default function Quotations() {
   const {
     toast
   } = useToast();
-  const handleQuotationCreate = (newQuotation: any) => {
-    setQuotations([...quotations, newQuotation]);
+  const [quotationToDownload, setQuotationToDownload] = useState<any | null>(null);
+  const downloadRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const generatePdf = async () => {
+      if (quotationToDownload && downloadRef.current) {
+        try {
+          await exportElementAsPDF(downloadRef.current, `${quotationToDownload.id}.pdf`);
+          toast({
+            title: "Download Ready",
+            description: `Quotation ${quotationToDownload.id} has been downloaded.`
+          });
+        } catch (error) {
+          toast({
+            title: "Download Failed",
+            description: "We couldn't generate the PDF. Please try again.",
+            variant: "destructive"
+          });
+        } finally {
+          setQuotationToDownload(null);
+        }
+      }
+    };
+
+    generatePdf();
+  }, [quotationToDownload, toast]);
+
+  const handleQuotationCreate = async (newQuotation: any) => {
+    // Map to Supabase schema
+    const quotationForDb = {
+      quotationNumber: newQuotation.id,
+      issueDate: newQuotation.issueDate,
+      validUntil: newQuotation.validUntil,
+      clientName: newQuotation.clientName,
+      clientId: newQuotation.clientId || newQuotation.clientName,
+      amount: newQuotation.amount,
+      status: newQuotation.status,
+      description: newQuotation.description || '',
+      items: newQuotation.lineItems || [],
+      notes: newQuotation.notes || ''
+    };
+
+    // Save to Supabase
+    const { data, error } = await supabase.from('quotations').insert(quotationForDb).select().single();
+
+    if (error) {
+      console.error("Error creating quotation:", error);
+      toast({
+        title: "Save Failed",
+        description: error.message || "Could not save quotation to database.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Update local state with merged data
+    if (data) {
+      setQuotations([...quotations, { ...newQuotation, ...data }]);
+    }
   };
+
   const handleDeleteClick = (quotation: any) => {
     setSelectedQuotation(quotation);
     setDeleteDialogOpen(true);
   };
-  const handleDeleteConfirm = () => {
+
+  const handleDeleteConfirm = async () => {
     if (selectedQuotation) {
+      // Delete from Supabase
+      const { error } = await supabase.from('quotations').delete().eq('id', selectedQuotation.id);
+
+      if (error) {
+        console.error("Error deleting quotation:", error);
+        toast({
+          title: "Delete Failed",
+          description: "Could not delete quotation from database.",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Update local state
       setQuotations(quotations.filter(q => q.id !== selectedQuotation.id));
       toast({
         title: "Quotation Deleted",
@@ -56,23 +135,23 @@ export default function Quotations() {
       setSelectedQuotation(null);
     }
   };
+
   const handleDownload = (quotation: any) => {
-    toast({
-      title: "Download Started",
-      description: `Downloading quotation ${quotation.id}`
-    });
+    setQuotationToDownload(quotation);
   };
 
   const handleViewClick = (quotation: any) => {
     setSelectedQuotation(quotation);
     setViewDialogOpen(true);
   };
+
   const handleStatusClick = (quotation: any) => {
     setSelectedQuotation(quotation);
     setNewStatus(quotation.status);
     setStatusDialogOpen(true);
   };
-  const handleStatusUpdate = () => {
+
+  const handleStatusUpdate = async () => {
     if (selectedQuotation && newStatus) {
       // Update quotation status
       setQuotations(quotations.map(q => q.id === selectedQuotation.id ? {
@@ -82,29 +161,75 @@ export default function Quotations() {
 
       // If status changed to "accepted", create an invoice
       if (newStatus === 'accepted') {
+        // Check if client exists, if not create new one
+        const clientExists = clients.some(c => c.name.toLowerCase() === selectedQuotation.clientName.toLowerCase());
+
+        if (!clientExists) {
+          const newClient = {
+            id: Date.now().toString(),
+            name: selectedQuotation.clientName,
+            email: "",
+            phone: "",
+            company: "",
+            address: "",
+            gstin: "",
+            totalInvoices: 0,
+            totalAmount: 0,
+            outstanding: 0,
+            lastInvoice: new Date().toISOString().split('T')[0]
+          };
+
+          setClients([...clients, newClient]);
+
+          toast({
+            title: "New Client Added",
+            description: `Client "${selectedQuotation.clientName}" has been added to your directory. Please update their details.`,
+            duration: 5000,
+          });
+        }
+
         // Generate sequential invoice number
         const existingNumbers = invoices
           .map(inv => {
-            const match = inv.id.match(/^INV-(\d+)$/);
+            const match = inv.invoiceNumber?.match(/^INV-(\d+)$/);
             return match ? parseInt(match[1]) : 0;
           })
           .filter(num => num > 0);
         const nextNumber = existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
-        
+
+        const invoiceNumber = `INV-${nextNumber.toString().padStart(3, '0')}`;
+
         const newInvoice = {
-          id: `INV-${nextNumber}`,
+          invoiceNumber,
           clientName: selectedQuotation.clientName,
+          clientId: selectedQuotation.clientId || selectedQuotation.clientName,
           amount: selectedQuotation.amount,
           status: 'pending',
           issueDate: new Date().toISOString().split('T')[0],
-          dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], // 30 days from now
-          lineItems: selectedQuotation.lineItems || [],
-          bankDetails: bankDetails
+          dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+          items: selectedQuotation.lineItems || [],
+          paymentDate: null,
         };
-        setInvoices([...invoices, newInvoice]);
+
+        // Save to Supabase
+        const { data: savedInvoice, error } = await supabase.from('invoices').insert(newInvoice).select().single();
+
+        if (error) {
+          console.error("Error creating invoice from quotation:", error);
+          toast({
+            title: "Invoice Creation Failed",
+            description: "Could not create invoice in database.",
+            variant: "destructive"
+          });
+          return;
+        }
+
+        // Add to local state with all fields (DB + local)
+        setInvoices([...invoices, { ...newInvoice, ...savedInvoice, lineItems: selectedQuotation.lineItems, bankDetails }]);
+
         toast({
           title: "Quotation Accepted & Invoice Created",
-          description: `Invoice ${newInvoice.id} has been created from this quotation`
+          description: `Invoice ${invoiceNumber} has been created from this quotation`
         });
       } else {
         toast({
@@ -116,11 +241,18 @@ export default function Quotations() {
       setSelectedQuotation(null);
     }
   };
+
   const filteredQuotations = quotations.filter(quote => quote.id.toLowerCase().includes(searchTerm.toLowerCase()) || quote.clientName.toLowerCase().includes(searchTerm.toLowerCase()) || quote.description.toLowerCase().includes(searchTerm.toLowerCase()));
-  const totalAmount = quotations.reduce((sum, quote) => sum + quote.amount, 0);
-  const acceptedAmount = quotations.filter(q => q.status === 'accepted').reduce((sum, quote) => sum + quote.amount, 0);
-  const pendingAmount = quotations.filter(q => q.status === 'sent').reduce((sum, quote) => sum + quote.amount, 0);
-  return <div className="space-y-6 animate-fade-in">
+
+  return (
+    <div className="space-y-6 animate-fade-in">
+      <div style={{ position: "absolute", left: "-9999px", top: "-9999px" }}>
+        {quotationToDownload && (
+          <div ref={downloadRef}>
+            <QuotationTemplate quotation={quotationToDownload} />
+          </div>
+        )}
+      </div>
       <QuotationDialog open={isDialogOpen} onOpenChange={setIsDialogOpen} onQuotationCreate={handleQuotationCreate} />
       {/* Page Header */}
       <div className="flex justify-between items-center">
@@ -141,9 +273,6 @@ export default function Quotations() {
           </Button>
         </div>
       </div>
-
-      {/* Quick Stats */}
-      
 
       {/* Quotations Table */}
       <Card>
@@ -179,7 +308,8 @@ export default function Quotations() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredQuotations.map(quote => <TableRow key={quote.id} className="hover:bg-accent/50 transition-colors">
+                {filteredQuotations.map(quote => (
+                  <TableRow key={quote.id} className="hover:bg-accent/50 transition-colors">
                     <TableCell>
                       <div>
                         <div className="font-medium text-foreground">{quote.id}</div>
@@ -189,11 +319,11 @@ export default function Quotations() {
                     <TableCell>
                       <div className="font-medium text-foreground">{quote.clientName}</div>
                     </TableCell>
-                     <TableCell>
-                       <div className="font-semibold text-foreground">
-                         ₹{quote.amount.toLocaleString()}
-                       </div>
-                     </TableCell>
+                    <TableCell>
+                      <div className="font-semibold text-foreground">
+                        ₹{quote.amount.toLocaleString()}
+                      </div>
+                    </TableCell>
                     <TableCell>
                       <Badge className={getStatusBadge(quote.status)}>
                         {quote.status.charAt(0).toUpperCase() + quote.status.slice(1)}
@@ -232,15 +362,18 @@ export default function Quotations() {
                         </DropdownMenuContent>
                       </DropdownMenu>
                     </TableCell>
-                  </TableRow>)}
+                  </TableRow>
+                ))}
               </TableBody>
             </Table>
           </div>
 
-          {filteredQuotations.length === 0 && <div className="text-center py-12 text-muted-foreground">
+          {filteredQuotations.length === 0 && (
+            <div className="text-center py-12 text-muted-foreground">
               <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
               <p>No quotations found matching your search.</p>
-            </div>}
+            </div>
+          )}
         </CardContent>
       </Card>
 
@@ -251,9 +384,11 @@ export default function Quotations() {
             <AlertDialogTitle>Update Quotation Status</AlertDialogTitle>
             <AlertDialogDescription>
               Change the status for quotation {selectedQuotation?.id}
-              {newStatus === 'accepted' && <span className="block mt-2 text-success font-medium">
+              {newStatus === 'accepted' && (
+                <span className="block mt-2 text-success font-medium">
                   Note: Accepting this quotation will automatically create an invoice.
-                </span>}
+                </span>
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="py-4">
@@ -313,18 +448,19 @@ export default function Quotations() {
           </div>
           <AlertDialogFooter>
             <AlertDialogCancel>Close</AlertDialogCancel>
-            <Button onClick={() => {
-              handleDownload(selectedQuotation);
-              toast({
-                title: "Download Ready",
-                description: "Your quotation is ready to download"
-              });
-            }}>
+            <Button
+              onClick={() => {
+                if (selectedQuotation) {
+                  handleDownload(selectedQuotation);
+                }
+              }}
+            >
               <Download className="h-4 w-4 mr-2" />
               Download PDF
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>;
+    </div>
+  );
 }

@@ -4,6 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/supabaseClient";
 import { FileText } from "lucide-react";
 
 export default function Auth() {
@@ -13,10 +15,11 @@ export default function Auth() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!email || !password) {
       toast({
         variant: "destructive",
@@ -36,47 +39,80 @@ export default function Auth() {
     }
 
     setLoading(true);
-    
-    // Placeholder for authentication logic
-    setTimeout(() => {
+
+    try {
+      if (isSignUp) {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+        });
+        if (error) throw error;
+        toast({
+          title: "Success",
+          description: "Account created! You can now sign in.",
+        });
+        setIsSignUp(false);
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (error) throw error;
+        toast({
+          title: "Welcome back!",
+          description: "Successfully signed in",
+        });
+        navigate("/");
+      }
+    } catch (error: any) {
       toast({
-        title: "Coming Soon",
-        description: "Authentication will be available once backend is enabled",
+        variant: "destructive",
+        title: "Authentication Failed",
+        description: error.message || "Something went wrong",
       });
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-background to-primary/10 p-4">
-      <Card className="w-full max-w-md shadow-lg animate-fade-in">
+    <div className="min-h-screen w-full flex items-center justify-center relative overflow-hidden bg-background">
+      {/* Animated Ambient Background */}
+      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[-20%] left-[-10%] w-[70%] h-[70%] bg-purple-600/20 rounded-full blur-[120px] animate-blob filter mix-blend-multiply opacity-70"></div>
+        <div className="absolute top-[-20%] right-[-10%] w-[70%] h-[70%] bg-indigo-600/20 rounded-full blur-[120px] animate-blob animation-delay-2000 filter mix-blend-multiply opacity-70"></div>
+        <div className="absolute bottom-[-20%] left-[20%] w-[70%] h-[70%] bg-pink-600/20 rounded-full blur-[120px] animate-blob animation-delay-4000 filter mix-blend-multiply opacity-70"></div>
+      </div>
+
+      <Card className="w-full max-w-md shadow-2xl animate-fade-in glass-panel border-white/10 relative z-10 bg-black/40 backdrop-blur-xl">
         <CardHeader className="space-y-3 text-center">
-          <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-            <FileText className="h-6 w-6 text-primary" />
+          <div className="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-[0_0_20px_rgba(168,85,247,0.4)] mb-4">
+            <FileText className="h-8 w-8 text-white" />
           </div>
-          <CardTitle className="text-2xl">
+          <CardTitle className="text-3xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-gray-400 text-glow">
             {isSignUp ? "Create Account" : "Welcome Back"}
           </CardTitle>
-          <CardDescription>
-            {isSignUp 
-              ? "Sign up to start managing your invoices" 
+          <CardDescription className="text-lg text-gray-400">
+            {isSignUp
+              ? "Sign up to start managing your invoices"
               : "Sign in to your account to continue"}
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-gray-300">Email</Label>
               <Input
                 id="email"
                 type="email"
                 placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-primary/50 focus:ring-primary/20 h-11"
                 required
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
               <Input
@@ -85,6 +121,7 @@ export default function Auth() {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-primary/50 focus:ring-primary/20 h-11"
                 required
               />
             </div>
@@ -98,27 +135,29 @@ export default function Auth() {
                   placeholder="••••••••"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="bg-white/5 border-white/10 text-white placeholder:text-gray-500 focus:border-primary/50 focus:ring-primary/20 h-11"
                   required
                 />
               </div>
             )}
 
-            <Button 
-              type="submit" 
-              className="w-full" 
+            <Button
+              type="submit"
+              className="w-full hover-scale h-11 text-lg font-medium bg-primary hover:bg-primary/90 shadow-[0_0_20px_rgba(168,85,247,0.3)] border border-primary/20 transition-all duration-300"
               disabled={loading}
             >
               {loading ? "Processing..." : (isSignUp ? "Sign Up" : "Sign In")}
             </Button>
 
-            <div className="text-center text-sm">
+            <div className="text-center text-sm pt-2">
               <button
                 type="button"
                 onClick={() => setIsSignUp(!isSignUp)}
-                className="text-primary hover:underline"
+                className="text-primary hover:text-purple-300 hover:underline font-medium transition-colors"
+                disabled={loading}
               >
-                {isSignUp 
-                  ? "Already have an account? Sign in" 
+                {isSignUp
+                  ? "Already have an account? Sign in"
                   : "Don't have an account? Sign up"}
               </button>
             </div>
