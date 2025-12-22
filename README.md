@@ -1,278 +1,133 @@
-📄 Invoice Management System
+# 📄 Invoice Management System
 
-A modern, web-based Invoice Management System designed to digitalize, automate, and streamline billing workflows for small and medium-scale businesses (SMEs).
-This project replaces manual and spreadsheet-based invoicing with a structured, secure, and analytics-driven solution.
+![Status](https://img.shields.io/badge/Status-Active-success)
+![License](https://img.shields.io/badge/License-MIT-blue)
+![Tech](https://img.shields.io/badge/Stack-React%20%7C%20Supabase-blueviolet)
 
-🚀 Project Overview
+> A modern, web-based Invoice Management System designed to digitalize, automate, and streamline billing workflows for small and medium-scale businesses (SMEs).
 
-The Invoice Management System is a full-stack web application that enables businesses to:
+---
 
-Create and manage professional invoices
+## 📑 Table of Contents
+- [Project Overview](#-project-overview)
+- [Key Features](#-key-features)
+- [Tech Stack](#-tech-stack)
+- [System Architecture](#-system-architecture)
+- [Getting Started](#-getting-started)
+- [Future Scope](#-future-scope)
+- [Author](#-author)
 
-Maintain centralized customer and inventory records
+---
 
-Automate tax and total calculations
+## 🚀 Project Overview
 
-Track payments and outstanding dues
+The **Invoice Management System** is a full-stack web application designed to replace manual and spreadsheet-based invoicing with a structured, secure, and analytics-driven solution.
 
-Visualize financial performance via dashboards and reports
+**It enables businesses to:**
+- Create and manage professional invoices.
+- Maintain centralized customer and inventory records.
+- Automate tax and total calculations.
+- Track payments and outstanding dues.
+- Visualize financial performance via detailed dashboards.
 
-The system is designed with simplicity, accuracy, scalability, and usability in mind—making it ideal for freelancers, startups, and SMEs.
+**Ideal for:** Freelancers, Startups, and SMEs looking for simplicity, accuracy, and scalability.
 
-🎯 Motivation
+---
 
-Many small businesses still rely on:
+## ✨ Key Features
 
-Paper invoices
+### 🔐 Authentication & Security
+- Secure user authentication (Email + Password)
+- Robust Session Management
+- **Row-Level Security (RLS)** for strict data isolation
 
-Excel spreadsheets
+### 🧾 Invoice Management
+| Feature | Description |
+| :--- | :--- |
+| **CRUD Operations** | Create, Update, Delete invoices easily |
+| **Line Items** | Multiple line items support per invoice |
+| **Auto-Calc** | Automatic subtotal, tax, and total computation |
+| **Status Tracking** | Track status: `Paid` \| `Pending` \| `Overdue` |
+| **PDF Export** | Generate professional A4 PDF invoices instantly |
 
-Static document templates
+### 👥 Client & Inventory Management
+- **Centralized Directory**: Manage all clients in one place.
+- **Health Score**: AI-driven evaluation of client reliability based on payment behavior (Good/Average/Poor).
+- **Inventory Sync**: Real-time product/service catalog with auto-selection.
 
-These approaches lead to:
+### 📊 Dashboard & Analytics
+- **Financial Summaries**: Total revenue, outstanding, and overdue payments.
+- **Visual Trends**: Monthly performance charts.
+- **Real-time Insights**: Data-driven decision making.
 
-Calculation errors
+---
 
-Disorganized records
+## 🛠 Tech Stack
 
-Poor payment tracking
+### Frontend
+![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
-Lack of financial insights
+### Backend & Database
+![Supabase](https://img.shields.io/badge/Supabase-181818?style=for-the-badge&logo=supabase&logoColor=3ECF8E)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
 
-This project addresses these problems by providing:
+### Tools & DevOps
+![Git](https://img.shields.io/badge/Git-F05032?style=for-the-badge&logo=git&logoColor=white)
+![VS Code](https://img.shields.io/badge/VS_Code-0078D4?style=for-the-badge&logo=visual%20studio%20code&logoColor=white)
 
-A centralized invoice platform
+---
 
-Automated calculations
+## 🏗 System Architecture
 
-Real-time analytics
+The system follows a modern web-based **Client-Server Architecture**:
 
-Professional invoice generation
+```mermaid
+graph TD
+    User((User))
+    Frontend[Frontend (React SPA)]
+    Backend[Supabase BaaS]
+    DB[(PostgreSQL Database)]
 
-🧩 Problem Statement
+    User -->|Interacts| Frontend
+    Frontend -->|REST / Realtime APIs| Backend
+    Backend -->|Auth & RLS| DB
+```
 
-There is a need for a centralized, user-friendly Invoice Management System that automates invoice creation, maintains organized customer and transaction records, enables real-time payment tracking, and generates meaningful financial reports to support effective decision-making for SMEs.
+---
 
-✨ Key Features
-🔐 Authentication & Security
+## ⚙️ Functional Requirements
 
-Secure user authentication (Email + Password)
+1. **User Auth**: Secure sign-up/sign-in flows.
+2. **Invoice Ops**: Full lifecycle management of invoices.
+3. **Calculations**: Automated tax processing.
+4. **Reporting**: Financial dashboards and client scoring.
+5. **Exports**: Downloadable PDF invoices.
 
-Session management
+---
 
-Row-Level Security (RLS) for data isolation
+## 🧠 Core Algorithms
 
-🧾 Invoice Management
+| Algorithm | Purpose | Complexity |
+| :--- | :--- | :--- |
+| **Invoice Calculation** | Subtotal, Tax & Total | O(n) |
+| **Client Health Score** | Reliability Assessment | O(1) |
+| **Invoice Search** | Real-time Filtering | O(n) |
 
-Create, update, delete invoices
+---
 
-Multiple line items per invoice
+## 🔮 Future Scope
 
-Automatic subtotal, tax, and total calculation
+- [ ] **Payment Gateway**: Integration with Razorpay/Stripe.
+- [ ] **Compliance**: GST and e-Invoicing support.
+- [ ] **Mobile App**: Native Android/iOS applications.
+- [ ] **AI Features**: OCR for invoice parsing.
 
-Invoice status tracking: Paid | Pending | Overdue
+---
 
-Search & filter invoices
+## 👤 Author
 
-👥 Client Management
+**Bhagyesh Rajendra Patil**
 
-Centralized client directory
-
-Client-wise invoice history
-
-Outstanding balance tracking
-
-Client health score evaluation
-
-📦 Inventory Management
-
-Product/service catalog
-
-Auto-selection during invoice creation
-
-Real-time inventory synchronization
-
-🧮 Automated Tax Calculation
-
-Configurable tax rates
-
-Error-free, consistent tax computation
-
-📄 PDF Invoice Generation
-
-Professional A4 invoice PDFs
-
-Download & share directly
-
-📊 Dashboard & Analytics
-
-Total revenue
-
-Outstanding & overdue payments
-
-Monthly trends
-
-Financial summaries
-
-🟢 Client Health Score
-
-Evaluates reliability based on payment behavior
-
-Categorized as Good / Average / Poor
-
-🏗️ System Architecture
-
-The system follows a web-based client–server architecture:
-
-Frontend (SPA)
-   |
-   |  REST / Realtime APIs
-   |
-Supabase (PostgreSQL + Auth + RLS)
-
-
-Frontend: User interface, validation, dashboards
-
-Backend (BaaS): Authentication, database, APIs
-
-Database: Relational (PostgreSQL), ACID-compliant
-
-🛠️ Tech Stack
-Frontend
-
-React
-
-TypeScript
-
-Tailwind CSS
-
-Modern SPA architecture
-
-Backend / Database
-
-Supabase (PostgreSQL)
-
-Row Level Security (RLS)
-
-Realtime subscriptions
-
-JWT-based authentication
-
-Tools & DevOps
-
-Git & GitHub
-
-Visual Studio Code
-
-Docker (optional)
-
-PDF generation libraries
-
-⚙️ Functional Requirements (Summary)
-
-User authentication & authorization
-
-Invoice CRUD operations
-
-Client & inventory management
-
-Automated tax & total calculations
-
-PDF invoice export
-
-Financial dashboards
-
-Search & filter functionality
-
-Client reliability scoring
-
-📈 Non-Functional Requirements
-
-High performance & low latency
-
-Scalability for growing businesses
-
-Secure data handling (HTTPS, encryption)
-
-Cross-platform browser compatibility
-
-Maintainable and modular architecture
-
-🧠 Core Algorithms Used
-Algorithm	Purpose	Time Complexity
-Invoice Calculation	Subtotal, tax & total	O(n)
-Invoice Search & Filter	Real-time filtering	O(n)
-Client Health Score	Payment reliability	O(1)
-Invoice Status Detection	Paid / Overdue	O(1)
-Inventory Sync	Stock consistency	O(n)
-Dashboard Aggregation	Financial metrics	O(n)
-PDF Generation	Invoice export	O(n)
-🖼️ Application Screens (Implemented)
-
-Sign In / Sign Up
-
-Client Management
-
-Invoice Creation
-
-Invoice Preview
-
-Payments & Dues
-
-Reports & Analytics
-
-Notifications
-
-Settings
-
-Supabase Database View
-
-🏁 Results & Conclusion
-
-The system successfully demonstrates:
-
-Reduction in manual errors
-
-Faster invoice creation
-
-Improved financial transparency
-
-Better cash-flow tracking
-
-Professional documentation standards
-
-It proves that modern web technologies + structured data handling can deliver a cost-effective alternative to heavyweight accounting software.
-
-🔮 Future Scope
-
-🔗 Payment Gateway Integration (Razorpay, Stripe, PayPal)
-
-🇮🇳 GST & e-Invoicing Compliance
-
-📱 Mobile Applications (Android / iOS)
-
-📊 Advanced Analytics & Forecasting
-
-🤖 AI-based OCR & Invoice Parsing
-
-🔐 Role-Based Access Control
-
-🌍 Multi-Currency & Localization Support
-
-🔄 Integration with Tally / Zoho / QuickBooks
-
-📚 References
-
-This project is supported by:
-
-Academic research (IEEE, MIS Quarterly)
-
-Industry platforms (SAP, Zoho, QuickBooks)
-
-Modern web documentation (React, TypeScript, Supabase)
-
-A complete reference list is included in the project report.
-
-👤 Author
-
-Bhagyesh Rajendra Patil
+Make sure to star the repo if you find it useful! 🌟
