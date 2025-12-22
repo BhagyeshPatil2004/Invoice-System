@@ -85,15 +85,56 @@ The system follows a modern web-based **Client-Server Architecture**:
 ```mermaid
 graph TD
     User((User))
-    Frontend[Frontend (React SPA)]
-    Backend[Supabase BaaS]
-    DB[(PostgreSQL Database)]
+    Frontend["Frontend (React SPA)"]
+    Backend["Supabase BaaS"]
+    DB[("PostgreSQL Database")]
 
     User -->|Interacts| Frontend
     Frontend -->|REST / Realtime APIs| Backend
     Backend -->|Auth & RLS| DB
 ```
 
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js (v18 or higher)
+- npm or yarn
+- A Supabase account
+
+### Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/BhagyeshPatil2004/Invoice-System.git
+   cd Invoice
+   ```
+
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
+
+3. **Supabase Configuration**
+   To connect the app to your backend:
+   1. create a new project on [Supabase](https://supabase.com/).
+   2. Go to **Settings** > **API**.
+   3. Copy the **Project URL** and **anon public** key.
+   4. Create a `.env` file in the root directory.
+   5. Add your keys as shown below:
+
+   ```env
+   VITE_SUPABASE_URL=your_project_url_here
+   VITE_SUPABASE_ANON_KEY=your_anon_key_here
+   ```
+
+   > ⚠️ **Important:** Never commit your `.env` file to GitHub. It contains sensitive keys.
+
+4. **Start the App**
+   ```bash
+   npm run dev
+   ```
 ---
 
 ## ⚙️ Functional Requirements
@@ -120,7 +161,6 @@ graph TD
 
 - [ ] **Payment Gateway**: Integration with Razorpay/Stripe.
 - [ ] **Compliance**: GST and e-Invoicing support.
-- [ ] **Mobile App**: Native Android/iOS applications.
 - [ ] **AI Features**: OCR for invoice parsing.
 
 ---
