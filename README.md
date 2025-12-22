@@ -86,9 +86,9 @@ The system follows a modern web-based **Client-Server Architecture**:
 ```mermaid
 graph TD
     User((User))
-    Frontend[Frontend (React SPA)]
-    Backend[Supabase BaaS]
-    DB[(PostgreSQL Database)]
+    Frontend["Frontend (React SPA)"]
+    Backend["Supabase BaaS"]
+    DB[("PostgreSQL Database")]
 
     User -->|Interacts| Frontend
     Frontend -->|REST / Realtime APIs| Backend
