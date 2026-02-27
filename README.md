@@ -158,6 +158,12 @@ graph TD
 | **Invoice Search** | Real-time Filtering | O(n) |
 
 ---
+<img width="1650" height="925" alt="Screenshot 2026-02-27 202953" src="https://github.com/user-attachments/assets/480945cb-2c56-4a6f-bdbd-eb057a280211" />
+<img width="1260" height="856" alt="Screenshot 2026-02-27 203010" src="https://github.com/user-attachments/assets/a41ea46a-fcde-4dde-8d71-14895e895f88" />
+<img width="1371" height="660" alt="Screenshot 2026-02-27 203448" src="https://github.com/user-attachments/assets/5c262e9a-a245-4922-89dd-6514c7ae4003" />
+
+---
+
 
 ## 🔮 Future Scope
 
