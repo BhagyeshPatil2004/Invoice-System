@@ -12,11 +12,12 @@ import {
 } from "@/components/ui/select";
 import { useData } from "@/contexts/DataContext";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
-import { Area, AreaChart, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
+import { Area, AreaChart, Bar, BarChart, Rectangle, XAxis, YAxis, CartesianGrid, ResponsiveContainer } from "recharts";
 import { toast } from "sonner";
 
 export default function Reports() {
   const [dateRange, setDateRange] = useState("yearly"); // Changed default to Yearly
+  const [chartType, setChartType] = useState<"area" | "bar">("area");
   const { invoices, payables } = useData();
 
   // Calculate analytics
@@ -162,8 +163,8 @@ export default function Reports() {
           profit: monthRevenue - monthExpenses
         };
       });
-    } else {
-      // Yearly or All (Default to 12 months of current year)
+    } else if (dateRange === 'yearly') {
+      // Yearly (Default to 12 months of current year)
       chartData = Array.from({ length: 12 }, (_, i) => {
         const month = new Date(now.getFullYear(), i, 1);
         const monthName = month.toLocaleDateString('en', { month: 'short' });
@@ -193,6 +194,46 @@ export default function Reports() {
           profit: monthRevenue - monthExpenses
         };
       });
+    } else {
+      // All Time - Yearly Breakdown
+      const years = new Set<number>();
+      invoices.forEach(inv => {
+        if (inv.issueDate) years.add(new Date(inv.issueDate).getFullYear());
+      });
+      payables.forEach(pay => {
+        if (pay.dueDate) years.add(new Date(pay.dueDate).getFullYear());
+      });
+
+      // Handle case with no data
+      if (years.size === 0) {
+        years.add(now.getFullYear());
+      }
+
+      const minYear = Math.min(...Array.from(years));
+      const maxYear = Math.max(...Array.from(years));
+
+      for (let year = minYear; year <= maxYear; year++) {
+        const yearRevenue = invoices
+          .filter(inv => {
+            const invDate = new Date(inv.issueDate);
+            return invDate.getFullYear() === year && inv.status?.toLowerCase() === "paid";
+          })
+          .reduce((sum, inv) => sum + inv.amount, 0);
+
+        const yearExpenses = payables
+          .filter(pay => {
+            const payDate = new Date(pay.dueDate);
+            return payDate.getFullYear() === year && pay.status?.toLowerCase() === "paid";
+          })
+          .reduce((sum, pay) => sum + pay.billAmount, 0);
+
+        chartData.push({
+          name: year.toString(),
+          revenue: yearRevenue,
+          expenses: yearExpenses,
+          profit: yearRevenue - yearExpenses
+        });
+      }
     }
 
     return {
@@ -281,22 +322,24 @@ export default function Reports() {
   };
 
   return (
-    <div className="space-y-6 animate-fade-in pb-10">
+    <div className="space-y-8 animate-fade-in pb-10">
       {/* Page Header */}
-      <div className="flex justify-between items-center">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-          <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white to-purple-400 text-glow">Reports & Analytics</h1>
+          <h1 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-white via-purple-200 to-purple-400 text-glow">
+            Reports & Analytics
+          </h1>
           <p className="text-gray-400 mt-2 text-lg">
             Comprehensive insights into your business performance
           </p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           <Select value={dateRange} onValueChange={setDateRange}>
-            <SelectTrigger className="w-[180px] bg-white/5 border-white/10 hover:border-primary/50 transition-colors">
-              <Calendar className="h-4 w-4 mr-2 text-primary" />
+            <SelectTrigger className="w-[160px] bg-black/40 border-white/10 hover:border-primary/50 transition-all duration-300 rounded-lg backdrop-blur-md hover:shadow-[0_0_15px_rgba(168,85,247,0.15)] hover:scale-105 active:scale-95 group">
+              <Calendar className="h-4 w-4 mr-2 text-primary group-hover:text-white transition-colors" />
               <SelectValue />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-black/90 border-white/10 backdrop-blur-xl">
               <SelectItem value="weekly">This Week</SelectItem>
               <SelectItem value="monthly">This Month</SelectItem>
               <SelectItem value="quarterly">This Quarter</SelectItem>
@@ -304,222 +347,381 @@ export default function Reports() {
               <SelectItem value="all">All Time</SelectItem>
             </SelectContent>
           </Select>
-          <Button variant="outline" onClick={handleExportExpenses} className="bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/50 group">
-            <Download className="h-4 w-4 mr-2 group-hover:text-primary transition-colors" />
+          <Button variant="outline" onClick={handleExportExpenses} className="bg-black/40 border-white/10 hover:bg-white/10 hover:border-danger/50 hover:text-danger hover:shadow-[0_0_15px_rgba(239,68,68,0.2)] transition-all duration-300 rounded-lg group backdrop-blur-md hover:scale-105 active:scale-95">
+            <Download className="h-4 w-4 mr-2 group-hover:animate-bounce" />
             Export Expenses
           </Button>
-          <Button variant="outline" onClick={handleExport} className="bg-white/5 border-white/10 hover:bg-white/10 hover:border-primary/50 group">
-            <Download className="h-4 w-4 mr-2 group-hover:text-primary transition-colors" />
+          <Button variant="default" onClick={handleExport} className="bg-primary hover:bg-primary/90 text-white shadow-[0_0_20px_rgba(124,58,237,0.3)] hover:shadow-[0_0_30px_rgba(124,58,237,0.6)] transition-all duration-300 rounded-lg hover:scale-105 active:scale-95 group">
+            <Download className="h-4 w-4 mr-2 group-hover:animate-bounce" />
             Export Sales
           </Button>
         </div>
       </div>
 
       {/* Key Metrics Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="glass-panel border-0 hover-glow transition-all duration-300 group">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2.5 rounded-xl bg-success/10 shrink-0 group-hover:bg-success/20 transition-colors shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-                <DollarSign className="h-6 w-6 text-success" />
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <Card className="glass-panel border-white/5 bg-gradient-to-br from-white/5 to-transparent hover:border-success/30 transition-all duration-500 group relative overflow-hidden">
+          <div className="absolute inset-0 bg-success/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <CardContent className="pt-6 relative z-10">
+            <div className="flex items-start justify-between mb-4">
+              <div className="p-3 rounded-2xl bg-success/10 group-hover:bg-success/20 transition-colors shadow-[0_0_20px_rgba(16,185,129,0.15)] group-hover:scale-110 duration-300">
+                <DollarSign className="h-7 w-7 text-success" />
               </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-gray-400">Revenue</p>
-                <div className="text-2xl font-bold text-white break-all drop-shadow-md">₹{analytics.totalRevenue.toFixed(2)}</div>
-              </div>
+              <span className="text-xs font-medium px-2 py-1 rounded-full bg-success/10 text-success border border-success/20">
+                Revenue
+              </span>
             </div>
-            <div className="text-sm text-success font-medium pl-1">From paid invoices</div>
+            <div>
+              <div className="text-3xl font-bold text-white break-all drop-shadow-lg tracking-tight">
+                ₹{analytics.totalRevenue.toFixed(2)}
+              </div>
+              <p className="text-sm text-gray-400 mt-1 font-medium">From paid invoices</p>
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="glass-panel border-0 hover-glow transition-all duration-300 group">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2.5 rounded-xl bg-danger/10 shrink-0 group-hover:bg-danger/20 transition-colors shadow-[0_0_15px_rgba(239,68,68,0.2)]">
-                <TrendingUp className="h-6 w-6 text-danger" />
+        <Card className="glass-panel border-white/5 bg-gradient-to-br from-white/5 to-transparent hover:border-danger/30 transition-all duration-500 group relative overflow-hidden">
+          <div className="absolute inset-0 bg-danger/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <CardContent className="pt-6 relative z-10">
+            <div className="flex items-start justify-between mb-4">
+              <div className="p-3 rounded-2xl bg-danger/10 group-hover:bg-danger/20 transition-colors shadow-[0_0_20px_rgba(239,68,68,0.15)] group-hover:scale-110 duration-300">
+                <TrendingUp className="h-7 w-7 text-danger" />
               </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-gray-400">Expenses</p>
-                <div className="text-2xl font-bold text-white break-all drop-shadow-md">₹{analytics.totalExpenses.toFixed(2)}</div>
-              </div>
+              <span className="text-xs font-medium px-2 py-1 rounded-full bg-danger/10 text-danger border border-danger/20">
+                Expenses
+              </span>
             </div>
-            <div className="text-sm text-danger font-medium pl-1">From paid bills</div>
+            <div>
+              <div className="text-3xl font-bold text-white break-all drop-shadow-lg tracking-tight">
+                ₹{analytics.totalExpenses.toFixed(2)}
+              </div>
+              <p className="text-sm text-gray-400 mt-1 font-medium">From paid bills</p>
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="glass-panel border-0 hover-glow transition-all duration-300 group">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2.5 rounded-xl bg-primary/10 shrink-0 group-hover:bg-primary/20 transition-colors shadow-[0_0_15px_rgba(168,85,247,0.2)]">
-                <DollarSign className="h-6 w-6 text-primary" />
+        <Card className="glass-panel border-white/5 bg-gradient-to-br from-white/5 to-transparent hover:border-primary/30 transition-all duration-500 group relative overflow-hidden">
+          <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <CardContent className="pt-6 relative z-10">
+            <div className="flex items-start justify-between mb-4">
+              <div className="p-3 rounded-2xl bg-primary/10 group-hover:bg-primary/20 transition-colors shadow-[0_0_20px_rgba(124,58,237,0.15)] group-hover:scale-110 duration-300">
+                <DollarSign className="h-7 w-7 text-primary" />
               </div>
-              <div className="min-w-0 flex-1">
-                <p className="text-sm font-medium text-gray-400">Profit</p>
-                <div className={`text-2xl font-bold break-all drop-shadow-md ${analytics.profit >= 0 ? 'text-success' : 'text-danger'}`}>
-                  ₹{analytics.profit.toFixed(2)}
-                </div>
-              </div>
+              <span className={`text-xs font-medium px-2 py-1 rounded-full border ${analytics.profit >= 0 ? 'bg-primary/10 text-primary border-primary/20' : 'bg-danger/10 text-danger border-danger/20'}`}>
+                {analytics.profitMargin}% Margin
+              </span>
             </div>
-            <div className="text-sm text-primary font-medium pl-1">Margin: {analytics.profitMargin}%</div>
+            <div>
+              <div className={`text-3xl font-bold break-all drop-shadow-lg tracking-tight ${analytics.profit >= 0 ? 'text-white' : 'text-danger'}`}>
+                ₹{analytics.profit.toFixed(2)}
+              </div>
+              <p className="text-sm text-gray-400 mt-1 font-medium">Net Profit</p>
+            </div>
           </CardContent>
         </Card>
 
-        <Card className="glass-panel border-0 hover-glow transition-all duration-300 group">
-          <CardContent className="pt-6">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="p-2.5 rounded-xl bg-primary/10 group-hover:bg-primary/20 transition-colors shadow-[0_0_15px_rgba(168,85,247,0.2)]">
-                <FileText className="h-6 w-6 text-primary" />
+        <Card className="glass-panel border-white/5 bg-gradient-to-br from-white/5 to-transparent hover:border-blue-500/30 transition-all duration-500 group relative overflow-hidden">
+          <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+          <CardContent className="pt-6 relative z-10">
+            <div className="flex items-start justify-between mb-4">
+              <div className="p-3 rounded-2xl bg-blue-500/10 group-hover:bg-blue-500/20 transition-colors shadow-[0_0_20px_rgba(59,130,246,0.15)] group-hover:scale-110 duration-300">
+                <FileText className="h-7 w-7 text-blue-500" />
               </div>
-              <div>
-                <p className="text-sm font-medium text-gray-400">Invoices</p>
-                <div className="text-2xl font-bold text-white drop-shadow-md">{analytics.totalInvoices}</div>
-              </div>
+              <span className="text-xs font-medium px-2 py-1 rounded-full bg-blue-500/10 text-blue-500 border border-blue-500/20">
+                Volume
+              </span>
             </div>
-            <div className="text-sm text-primary font-medium pl-1">{analytics.totalPayables} payables</div>
+            <div>
+              <div className="text-3xl font-bold text-white drop-shadow-lg tracking-tight">
+                {analytics.totalInvoices}
+              </div>
+              <p className="text-sm text-gray-400 mt-1 font-medium">{analytics.totalPayables} Payables processed</p>
+            </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Reports Tabs */}
-      <Tabs defaultValue="sales" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-2 bg-black/20 backdrop-blur-md border border-white/5 p-1 h-auto rounded-xl">
-          <TabsTrigger value="sales" className="data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-primary/25 rounded-lg py-2.5 transition-all">
-            <BarChart3 className="h-4 w-4 mr-2" />
-            Sales Report
-          </TabsTrigger>
-          <TabsTrigger value="clients" className="data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-lg data-[state=active]:shadow-primary/25 rounded-lg py-2.5 transition-all">
-            <Users className="h-4 w-4 mr-2" />
-            Client Analytics
-          </TabsTrigger>
-        </TabsList>
+      {/* Reports Tabs - Premium Floating Style */}
+      <Tabs defaultValue="sales" className="space-y-8">
+        <div className="flex justify-center">
+          <TabsList className="bg-black/40 backdrop-blur-xl border border-white/10 p-1.5 h-auto rounded-full inline-flex shadow-2xl">
+            <TabsTrigger
+              value="sales"
+              className="rounded-full px-8 py-3 text-sm font-medium transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-[0_0_30px_rgba(124,58,237,0.4)] text-gray-400 hover:text-white"
+            >
+              <div className="flex items-center gap-2">
+                <BarChart3 className="h-4 w-4" />
+                <span>Sales Overview</span>
+              </div>
+            </TabsTrigger>
+            <TabsTrigger
+              value="clients"
+              className="rounded-full px-8 py-3 text-sm font-medium transition-all duration-300 data-[state=active]:bg-primary data-[state=active]:text-white data-[state=active]:shadow-[0_0_30px_rgba(124,58,237,0.4)] text-gray-400 hover:text-white"
+            >
+              <div className="flex items-center gap-2">
+                <Users className="h-4 w-4" />
+                <span>Client Insights</span>
+              </div>
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
-        <TabsContent value="sales" className="space-y-4">
-          <Card className="glass-panel border-0">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-xl font-bold">
-                <BarChart3 className="h-5 w-5 text-primary" />
-                Sales Performance
-              </CardTitle>
-              <CardDescription className="text-gray-400">
-                Revenue trends and sales analysis for the selected period
-              </CardDescription>
+        <TabsContent value="sales" className="space-y-4 animate-slide-up">
+          <Card className="glass-panel border-white/5 shadow-2xl overflow-hidden relative">
+            <div className="absolute top-0 right-0 p-32 bg-primary/5 rounded-full blur-[100px] pointer-events-none" />
+
+            <CardHeader className="relative z-10 border-b border-white/5 pb-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-3 text-xl font-bold text-white">
+                    <div className="p-2 rounded-lg bg-primary/10">
+                      <BarChart3 className="h-5 w-5 text-primary" />
+                    </div>
+                    Sales Performance
+                  </CardTitle>
+                  <CardDescription className="text-gray-400 ml-12">
+                    Revenue vs Expenses vs Profit analysis
+                  </CardDescription>
+                </div>
+                <div className="flex bg-white/5 rounded-lg p-1 border border-white/5">
+                  <button
+                    onClick={() => setChartType("area")}
+                    className={`p-1.5 rounded-md transition-all ${chartType === "area" ? "bg-primary text-white shadow-lg" : "text-gray-400 hover:text-white"}`}
+                  >
+                    <TrendingUp className="h-4 w-4" />
+                  </button>
+                  <button
+                    onClick={() => setChartType("bar")}
+                    className={`p-1.5 rounded-md transition-all ${chartType === "bar" ? "bg-primary text-white shadow-lg" : "text-gray-400 hover:text-white"}`}
+                  >
+                    <BarChart3 className="h-4 w-4" />
+                  </button>
+                </div>
+              </div>
             </CardHeader>
-            <CardContent className="space-y-4 pl-0">
-              <div className="h-[400px] w-full">
+            <CardContent className="pt-6 relative z-10">
+              <div className="h-[450px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={analytics.chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="hsl(var(--success))" stopOpacity={0.4} />
-                        <stop offset="95%" stopColor="hsl(var(--success))" stopOpacity={0} />
-                      </linearGradient>
-                      <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.4} />
-                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
-                      </linearGradient>
-                      <linearGradient id="colorExpenses" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="hsl(var(--destructive))" stopOpacity={0.4} />
-                        <stop offset="95%" stopColor="hsl(var(--destructive))" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" className="stroke-white/5" vertical={false} />
-                    <XAxis
-                      dataKey="name"
-                      stroke="#888888"
-                      fontSize={12}
-                      tickLine={false}
-                      axisLine={false}
-                      dy={10}
-                    />
-                    <YAxis
-                      stroke="#888888"
-                      fontSize={12}
-                      tickLine={false}
-                      axisLine={false}
-                      tickFormatter={(value) => {
-                        if (value >= 1000000000) return `₹${(value / 1000000000).toFixed(1)}B`;
-                        if (value >= 1000000) return `₹${(value / 1000000).toFixed(1)}M`;
-                        if (value >= 1000) return `₹${(value / 1000).toFixed(0)}k`;
-                        return `₹${value}`;
-                      }}
-                      width={60}
-                      dx={-10}
-                    />
-                    <ChartTooltip
-                      content={({ active, payload }) => {
-                        if (active && payload && payload.length) {
-                          return (
-                            <div className="rounded-xl border border-white/10 bg-black/80 backdrop-blur-xl p-4 shadow-2xl">
-                              <div className="text-sm font-bold mb-3 text-gray-200 border-b border-white/10 pb-2">{payload[0].payload.name}</div>
-                              <div className="space-y-2">
-                                <div className="flex items-center gap-3 text-sm">
-                                  <div className="w-2.5 h-2.5 rounded-full bg-success shadow-[0_0_8px_hsl(var(--success))]" />
-                                  <span className="text-gray-400 min-w-[60px]">Revenue:</span>
-                                  <span className="font-mono font-bold text-white">₹{Number(payload[0].payload.revenue).toLocaleString()}</span>
+                  {chartType === "area" ? (
+                    <AreaChart data={analytics.chartData} margin={{ top: 20, right: 20, left: 0, bottom: 0 }}>
+                      <defs>
+                        <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="hsl(var(--success))" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="hsl(var(--success))" stopOpacity={0} />
+                        </linearGradient>
+                        <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
+                        </linearGradient>
+                        <linearGradient id="colorExpenses" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="hsl(var(--destructive))" stopOpacity={0.3} />
+                          <stop offset="95%" stopColor="hsl(var(--destructive))" stopOpacity={0} />
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-white/5" vertical={false} />
+                      <XAxis
+                        dataKey="name"
+                        stroke="#666"
+                        fontSize={12}
+                        tickLine={false}
+                        axisLine={false}
+                        dy={10}
+                      />
+                      <YAxis
+                        stroke="#666"
+                        fontSize={12}
+                        tickLine={false}
+                        axisLine={false}
+                        tickFormatter={(value) => {
+                          if (value >= 1000000000) return `₹${(value / 1000000000).toFixed(1)}B`;
+                          if (value >= 1000000) return `₹${(value / 1000000).toFixed(1)}M`;
+                          if (value >= 1000) return `₹${(value / 1000).toFixed(0)}k`;
+                          return `₹${value}`;
+                        }}
+                        width={60}
+                        dx={-10}
+                      />
+                      <ChartTooltip
+                        content={({ active, payload }) => {
+                          if (active && payload && payload.length) {
+                            return (
+                              <div className="rounded-xl border border-white/10 bg-black/90 backdrop-blur-xl p-4 shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+                                <div className="text-sm font-bold mb-3 text-gray-200 border-b border-white/10 pb-2 flex justify-between items-center">
+                                  <span>{payload[0].payload.name}</span>
+                                  <span className="text-xs font-normal text-gray-500 px-2 py-0.5 rounded bg-white/5">{dateRange.toUpperCase()}</span>
                                 </div>
-                                <div className="flex items-center gap-3 text-sm">
-                                  <div className="w-2.5 h-2.5 rounded-full bg-primary shadow-[0_0_8px_hsl(var(--primary))]" />
-                                  <span className="text-gray-400 min-w-[60px]">Profit:</span>
-                                  <span className="font-mono font-bold text-white">₹{Number(payload[0].payload.profit).toLocaleString()}</span>
-                                </div>
-                                <div className="flex items-center gap-3 text-sm">
-                                  <div className="w-2.5 h-2.5 rounded-full bg-destructive shadow-[0_0_8px_hsl(var(--destructive))]" />
-                                  <span className="text-gray-400 min-w-[60px]">Expenses:</span>
-                                  <span className="font-mono font-bold text-white">₹{Number(payload[0].payload.expenses).toLocaleString()}</span>
+                                <div className="space-y-3">
+                                  <div className="flex items-center justify-between gap-8 text-sm group">
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-2 h-2 rounded-full bg-success shadow-[0_0_8px_hsl(var(--success))]" />
+                                      <span className="text-gray-400">Revenue</span>
+                                    </div>
+                                    <span className="font-mono font-bold text-success">₹{Number(payload[0].payload.revenue).toLocaleString()}</span>
+                                  </div>
+                                  <div className="flex items-center justify-between gap-8 text-sm">
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_hsl(var(--primary))]" />
+                                      <span className="text-gray-400">Profit</span>
+                                    </div>
+                                    <span className="font-mono font-bold text-primary">₹{Number(payload[0].payload.profit).toLocaleString()}</span>
+                                  </div>
+                                  <div className="flex items-center justify-between gap-8 text-sm">
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-2 h-2 rounded-full bg-destructive shadow-[0_0_8px_hsl(var(--destructive))]" />
+                                      <span className="text-gray-400">Expenses</span>
+                                    </div>
+                                    <span className="font-mono font-bold text-destructive">₹{Number(payload[0].payload.expenses).toLocaleString()}</span>
+                                  </div>
                                 </div>
                               </div>
-                            </div>
-                          );
-                        }
-                        return null;
-                      }}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="revenue"
-                      stroke="hsl(var(--success))"
-                      strokeWidth={3}
-                      fillOpacity={1}
-                      fill="url(#colorRevenue)"
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="expenses"
-                      stroke="hsl(var(--destructive))"
-                      strokeWidth={3}
-                      fillOpacity={1}
-                      fill="url(#colorExpenses)"
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="profit"
-                      stroke="hsl(var(--primary))"
-                      strokeWidth={3}
-                      fillOpacity={1}
-                      fill="url(#colorProfit)"
-                    />
-                  </AreaChart>
+                            );
+                          }
+                          return null;
+                        }}
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="revenue"
+                        stroke="hsl(var(--success))"
+                        strokeWidth={3}
+                        fillOpacity={1}
+                        fill="url(#colorRevenue)"
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="expenses"
+                        stroke="hsl(var(--destructive))"
+                        strokeWidth={3}
+                        fillOpacity={1}
+                        fill="url(#colorExpenses)"
+                      />
+                      <Area
+                        type="monotone"
+                        dataKey="profit"
+                        stroke="hsl(var(--primary))"
+                        strokeWidth={3}
+                        fillOpacity={1}
+                        fill="url(#colorProfit)"
+                      />
+                    </AreaChart>
+                  ) : (
+                    <BarChart data={analytics.chartData} margin={{ top: 20, right: 20, left: 0, bottom: 0 }} barGap={2}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-white/5" vertical={false} />
+                      <XAxis
+                        dataKey="name"
+                        stroke="#666"
+                        fontSize={12}
+                        tickLine={false}
+                        axisLine={false}
+                        dy={10}
+                      />
+                      <YAxis
+                        stroke="#666"
+                        fontSize={12}
+                        tickLine={false}
+                        axisLine={false}
+                        tickFormatter={(value) => {
+                          if (value >= 1000000000) return `₹${(value / 1000000000).toFixed(1)}B`;
+                          if (value >= 1000000) return `₹${(value / 1000000).toFixed(1)}M`;
+                          if (value >= 1000) return `₹${(value / 1000).toFixed(0)}k`;
+                          return `₹${value}`;
+                        }}
+                        width={60}
+                        dx={-10}
+                      />
+                      <ChartTooltip
+                        cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+                        content={({ active, payload }) => {
+                          if (active && payload && payload.length) {
+                            return (
+                              <div className="rounded-xl border border-white/10 bg-black/90 backdrop-blur-xl p-4 shadow-[0_0_30px_rgba(0,0,0,0.5)]">
+                                <div className="text-sm font-bold mb-3 text-gray-200 border-b border-white/10 pb-2 flex justify-between items-center">
+                                  <span>{payload[0].payload.name}</span>
+                                  <span className="text-xs font-normal text-gray-500 px-2 py-0.5 rounded bg-white/5">{dateRange.toUpperCase()}</span>
+                                </div>
+                                <div className="space-y-3">
+                                  <div className="flex items-center justify-between gap-8 text-sm group">
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-2 h-2 rounded-full bg-success shadow-[0_0_8px_hsl(var(--success))]" />
+                                      <span className="text-gray-400">Revenue</span>
+                                    </div>
+                                    <span className="font-mono font-bold text-success">₹{Number(payload[0].payload.revenue).toLocaleString()}</span>
+                                  </div>
+                                  <div className="flex items-center justify-between gap-8 text-sm">
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-2 h-2 rounded-full bg-primary shadow-[0_0_8px_hsl(var(--primary))]" />
+                                      <span className="text-gray-400">Profit</span>
+                                    </div>
+                                    <span className="font-mono font-bold text-primary">₹{Number(payload[0].payload.profit).toLocaleString()}</span>
+                                  </div>
+                                  <div className="flex items-center justify-between gap-8 text-sm">
+                                    <div className="flex items-center gap-2">
+                                      <div className="w-2 h-2 rounded-full bg-destructive shadow-[0_0_8px_hsl(var(--destructive))]" />
+                                      <span className="text-gray-400">Expenses</span>
+                                    </div>
+                                    <span className="font-mono font-bold text-destructive">₹{Number(payload[0].payload.expenses).toLocaleString()}</span>
+                                  </div>
+                                </div>
+                              </div>
+                            );
+                          }
+                          return null;
+                        }}
+                      />
+                      <Bar
+                        dataKey="revenue"
+                        fill="hsl(var(--success))"
+                        radius={[4, 4, 0, 0]}
+                        maxBarSize={50}
+                        fillOpacity={0.8}
+                        minPointSize={5}
+                      />
+                      <Bar
+                        dataKey="expenses"
+                        fill="hsl(var(--destructive))"
+                        radius={[4, 4, 0, 0]}
+                        maxBarSize={50}
+                        fillOpacity={0.8}
+                        minPointSize={5}
+                      />
+                      <Bar
+                        dataKey="profit"
+                        fill="hsl(var(--primary))"
+                        radius={[4, 4, 0, 0]}
+                        maxBarSize={50}
+                        fillOpacity={0.8}
+                        minPointSize={5}
+                      />
+                    </BarChart>
+                  )}
                 </ResponsiveContainer>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="clients" className="space-y-4">
-          <Card className="glass-panel border-0">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-xl font-bold">
-                <Users className="h-5 w-5 text-primary" />
+        <TabsContent value="clients" className="space-y-4 animate-slide-up">
+          <Card className="glass-panel border-white/5 shadow-2xl relative overflow-hidden">
+            <div className="absolute bottom-0 left-0 p-32 bg-purple-500/5 rounded-full blur-[100px] pointer-events-none" />
+
+            <CardHeader className="border-b border-white/5 pb-6">
+              <CardTitle className="flex items-center gap-3 text-xl font-bold text-white">
+                <div className="p-2 rounded-lg bg-primary/10">
+                  <Users className="h-5 w-5 text-primary" />
+                </div>
                 Client Analytics
               </CardTitle>
-              <CardDescription className="text-gray-400">
+              <CardDescription className="text-gray-400 ml-12">
                 Insights into client behavior and revenue distribution
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="p-6 border border-white/10 rounded-xl bg-white/5">
-                  <h4 className="font-semibold mb-4 text-lg">Top Revenue Sources</h4>
+            <CardContent className="pt-6 relative z-10">
+              <div className="space-y-6">
+                <div className="p-6 border border-white/5 rounded-2xl bg-white/[0.02] backdrop-blur-sm">
+                  <h4 className="font-semibold mb-6 text-lg flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4 text-success" />
+                    Top Revenue Sources
+                  </h4>
                   <div className="space-y-3">
                     {invoices
                       .reduce((acc: any[], inv) => {
@@ -534,29 +736,42 @@ export default function Reports() {
                       .sort((a, b) => b.total - a.total)
                       .slice(0, 5)
                       .map((item, idx) => (
-                        <div key={idx} className="flex justify-between items-center p-3 rounded-lg hover:bg-white/5 transition-colors group">
-                          <span className="text-sm font-medium text-gray-300 group-hover:text-white transition-colors">{item.client || 'Unknown Client'}</span>
-                          <span className="font-bold text-success">₹{item.total.toFixed(2)}</span>
+                        <div key={idx} className="flex justify-between items-center p-4 rounded-xl bg-white/5 hover:bg-white/10 transition-all duration-300 group border border-transparent hover:border-primary/20">
+                          <div className="flex items-center gap-4">
+                            <span className="w-6 h-6 rounded-full bg-white/10 flex items-center justify-center text-xs font-bold text-gray-400 group-hover:bg-primary group-hover:text-white transition-colors">
+                              {idx + 1}
+                            </span>
+                            <span className="text-sm font-medium text-gray-200 group-hover:text-white transition-colors">{item.client || 'Unknown Client'}</span>
+                          </div>
+                          <span className="font-bold text-success font-mono group-hover:scale-105 transition-transform">₹{item.total.toFixed(2)}</span>
                         </div>
                       ))}
                     {invoices.length === 0 && (
-                      <p className="text-sm text-gray-500 italic">No client data available</p>
+                      <div className="text-center py-8 text-gray-500 italic">
+                        No client data available
+                      </div>
                     )}
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-5 border border-white/10 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
-                    <p className="text-sm text-gray-400 mb-1">Active Clients</p>
-                    <p className="text-3xl font-bold text-white text-glow">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="p-6 border border-white/5 rounded-2xl bg-gradient-to-br from-white/[0.02] to-transparent hover:border-primary/20 transition-all duration-300">
+                    <p className="text-sm text-gray-400 mb-2 font-medium">Active Clients</p>
+                    <p className="text-4xl font-bold text-white text-glow">
                       {new Set(invoices.map(inv => inv.clientName)).size}
                     </p>
+                    <div className="mt-2 text-xs text-primary/80 px-2 py-1 rounded bg-primary/10 inline-block">
+                      Total distinct clients
+                    </div>
                   </div>
-                  <div className="p-5 border border-white/10 rounded-xl bg-white/5 hover:bg-white/10 transition-colors">
-                    <p className="text-sm text-gray-400 mb-1">Avg Client Value</p>
-                    <p className="text-3xl font-bold text-white text-glow">
-                      ₹{invoices.length > 0 ? (analytics.totalRevenue / new Set(invoices.map(inv => inv.clientName)).size).toFixed(0) : '0'}
+                  <div className="p-6 border border-white/5 rounded-2xl bg-gradient-to-br from-white/[0.02] to-transparent hover:border-blue-500/20 transition-all duration-300">
+                    <p className="text-sm text-gray-400 mb-2 font-medium">Avg Client Revenue</p>
+                    <p className="text-4xl font-bold text-white text-glow">
+                      ₹{invoices.length > 0 ? (analytics.totalRevenue / (new Set(invoices.map(inv => inv.clientName)).size || 1)).toFixed(0) : '0'}
                     </p>
+                    <div className="mt-2 text-xs text-blue-400/80 px-2 py-1 rounded bg-blue-500/10 inline-block">
+                      Per active client
+                    </div>
                   </div>
                 </div>
               </div>

@@ -62,7 +62,7 @@ export default function Auth() {
           title: "Welcome back!",
           description: "Successfully signed in",
         });
-        navigate("/");
+        navigate("/dashboard");
       }
     } catch (error: any) {
       toast({
@@ -85,7 +85,14 @@ export default function Auth() {
       </div>
 
       <Card className="w-full max-w-md shadow-2xl animate-fade-in glass-panel border-white/10 relative z-10 bg-black/40 backdrop-blur-xl">
-        <CardHeader className="space-y-3 text-center">
+        <CardHeader className="space-y-3 text-center relative">
+          <Button
+            variant="ghost"
+            className="absolute left-0 top-0 text-gray-400 hover:text-white"
+            onClick={() => navigate("/")}
+          >
+            ← Home
+          </Button>
           <div className="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center shadow-[0_0_20px_rgba(168,85,247,0.4)] mb-4">
             <FileText className="h-8 w-8 text-white" />
           </div>

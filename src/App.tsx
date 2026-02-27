@@ -16,6 +16,7 @@ import Settings from "./pages/Settings";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
 import Products from "./pages/Products";
+import Landing from "./pages/Landing";
 
 const queryClient = new QueryClient();
 
@@ -38,22 +39,24 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 const AuthRoute = ({ children }: { children: React.ReactNode }) => {
   const { session } = useData();
-  if (session) return <Navigate to="/" />;
+  if (session) return <Navigate to="/dashboard" />;
   return <>{children}</>;
 };
 
 const AppRoutes = () => {
   return (
     <Routes>
+      <Route path="/" element={<Landing />} />
       <Route path="/auth" element={
         <AuthRoute>
           <Auth />
         </AuthRoute>
       } />
-      <Route path="/" element={
+      {/* Dashboard Routes - All moved under /dashboard or specific paths */}
+      <Route path="/dashboard" element={
         <ProtectedRoute>
           <Layout>
-            <Clients />
+            <Clients /> {/* Default view for dashboard */}
           </Layout>
         </ProtectedRoute>
       } />

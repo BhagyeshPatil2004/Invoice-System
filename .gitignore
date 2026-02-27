@@ -24,3 +24,8 @@ dist-ssr
 *.sw?
 
 .env
+
+# Supabase and temporary files
+.env*
+supabase/
+vite.config.ts.timestamp-*

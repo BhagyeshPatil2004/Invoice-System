@@ -89,7 +89,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
       if (clientsData) setClients(clientsData);
 
       // Invoices
-      const { data: invoicesData } = await supabase.from('invoices').select('*');
+      const { data: invoicesData } = await supabase.from('invoices').select('*').order('issueDate', { ascending: false });
       if (invoicesData) setInvoices(invoicesData);
 
       // Products

@@ -39,8 +39,10 @@ export default function QuotationDialog({ open, onOpenChange, onQuotationCreate 
         setQuotationNumber("QUO-001");
       } else {
         const maxNum = quotations.reduce((max, quo) => {
-          // Handle both id (old) and quotationNumber (new) fields
-          const idToCheck = quo.quotationNumber || quo.id;
+          // Handle id, quotationNumber, and snake_case quotation_number
+          const idToCheck = quo.quotationNumber || quo.quotation_number || quo.id;
+          if (!idToCheck) return max;
+
           const match = idToCheck.toString().match(/QUO-(\d+)/);
           if (match) {
             const num = parseInt(match[1]);
@@ -169,11 +171,7 @@ export default function QuotationDialog({ open, onOpenChange, onQuotationCreate 
     }
 
     const newQuotation = {
-      // id: quotationNumber, // Let Supabase handle ID generation or use a separate logic if needed, but for now we pass the quotaionNumber as ID for legacy or mapping
-      // Actually, similar to InvoiceDialog, we should pass proper fields.
-      // But the caller handleQuotationCreate expects an object.
-      // We'll pass `id` as quotationNumber for the text ID (e.g. QUO-001) which the parent might use or map.
-      id: quotationNumber,
+      id: crypto.randomUUID(),
       quotationNumber,
       clientName,
       clientId: clientName, // Simple mapping for now
@@ -371,7 +369,7 @@ export default function QuotationDialog({ open, onOpenChange, onQuotationCreate 
                     {item.taxType !== 'none' && (
                       <>
                         <div className="col-span-3">
-                          <Label htmlFor={`tax-rate-${item.id}`} className="text-xs text-muted-foreground">Tax Rate</Label>
+                          <Label htmlFor={`tax-rate-${item.id}`} className="text-xs text-muted-foreground flex items-center">Tax Rate</Label>
                           <Select
                             value={item.taxRate.toString()}
                             onValueChange={(value) => updateLineItem(item.id, 'taxRate', parseFloat(value))}
@@ -388,13 +386,13 @@ export default function QuotationDialog({ open, onOpenChange, onQuotationCreate 
                           </Select>
                         </div>
                         <div className="col-span-3">
-                          <Label className="text-xs text-muted-foreground">Tax Amount</Label>
+                          <Label className="text-xs text-muted-foreground flex items-center">Tax Amount</Label>
                           <div className="h-10 flex items-center font-medium text-warning mt-1">
                             ₹{calculateItemTax(item).toFixed(2)}
                           </div>
                         </div>
                         <div className="col-span-2">
-                          <Label className="text-xs text-muted-foreground">Item Total</Label>
+                          <Label className="text-xs text-muted-foreground flex items-center">Item Total</Label>
                           <div className="h-10 flex items-center font-bold text-success mt-1">
                             ₹{(calculateItemTotal(item) + calculateItemTax(item)).toFixed(2)}
                           </div>

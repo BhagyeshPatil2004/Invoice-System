@@ -151,13 +151,60 @@ export default function Clients() {
   const [editClient, setEditClient] = useState<any>(null);
   const { toast } = useToast();
 
-  const handleClientCreate = (newClient: any) => {
+  const handleClientCreate = async (newClient: any) => {
+    // Optimistic update
     setClients([...clients, newClient]);
+
+    // Sync to Supabase - removing fields that might not exist in DB schema
+    const clientForDb = {
+      // Removed id - let Supabase auto-generate UUID
+      name: newClient.name,
+      email: newClient.email,
+      phone: newClient.phone,
+      company: newClient.company,
+      address: newClient.address
+      // Removed: gstin, status, createdAt, totalAmount, etc. to prevent schema errors
+    };
+
+    const { error } = await supabase.from('clients').insert(clientForDb);
+
+    if (error) {
+      console.error("Error creating client:", error);
+      toast({
+        title: "Save Failed",
+        description: error.message || "Could not save client to database. Changes may be lost on refresh.",
+        variant: "destructive"
+      });
+      // Rollback
+      setClients(clients);
+    }
   };
 
-  const handleClientUpdate = (updatedClient: any) => {
+  const handleClientUpdate = async (updatedClient: any) => {
+    // Optimistic update
     setClients(clients.map(c => c.id === updatedClient.id ? updatedClient : c));
     setEditClient(null);
+
+    // Sync to Supabase
+    const { error } = await supabase.from('clients').update({
+      name: updatedClient.name,
+      email: updatedClient.email,
+      phone: updatedClient.phone,
+      company: updatedClient.company,
+      address: updatedClient.address,
+      // Removed: gstin
+      // Don't update derived fields like totals if they aren't editable here
+    }).eq('id', updatedClient.id);
+
+    if (error) {
+      console.error("Error updating client:", error);
+      toast({
+        title: "Update Failed",
+        description: "Could not sync changes to database.",
+        variant: "destructive"
+      });
+      // Rollback not strictly implemented here but data would revert on refresh
+    }
   };
 
   const handleViewDetails = (client: any) => {

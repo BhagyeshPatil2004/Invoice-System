@@ -54,7 +54,10 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
       } else {
         // Extract numbers from existing IDs (assuming format INV-XXX)
         const maxNum = invoices.reduce((max, inv) => {
-          const match = inv.id.match(/INV-(\d+)/);
+          const idToCheck = inv.invoiceNumber || inv.invoice_number || inv.id;
+          if (!idToCheck) return max;
+
+          const match = idToCheck.toString().match(/INV-(\d+)/);
           if (match) {
             const num = parseInt(match[1]);
             return num > max ? num : max;
@@ -213,8 +216,8 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
     const hasBankInfo = Object.values(mergedBankDetails).some(value => value);
 
     const newInvoice = {
-      // id: invoiceNumber, // Remove ID to let Supabase generate UUID
-      invoiceNumber, // Add invoiceNumber explicitly
+      id: crypto.randomUUID(),
+      invoiceNumber,
       clientId,
       clientName: clientId,
       description: lineItems[0]?.description || "Invoice",
@@ -419,7 +422,7 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
                     {item.taxType !== 'none' && (
                       <>
                         <div className="col-span-3">
-                          <Label htmlFor={`tax-rate-${item.id}`} className="text-xs text-muted-foreground">Tax Rate</Label>
+                          <Label htmlFor={`tax-rate-${item.id}`} className="text-xs text-muted-foreground flex items-center">Tax Rate</Label>
                           <Select
                             value={item.taxRate.toString()}
                             onValueChange={(value) => updateLineItem(item.id, 'taxRate', parseInt(value))}
@@ -436,13 +439,13 @@ export default function InvoiceDialog({ open, onOpenChange, onInvoiceCreate }: I
                           </Select>
                         </div>
                         <div className="col-span-3">
-                          <Label className="text-xs text-muted-foreground">Tax Amount</Label>
+                          <Label className="text-xs text-muted-foreground flex items-center">Tax Amount</Label>
                           <div className="h-10 flex items-center font-medium text-warning mt-1">
                             ₹{calculateItemTax(item).toFixed(2)}
                           </div>
                         </div>
                         <div className="col-span-2">
-                          <Label className="text-xs text-muted-foreground">Item Total</Label>
+                          <Label className="text-xs text-muted-foreground flex items-center">Item Total</Label>
                           <div className="h-10 flex items-center font-bold text-success mt-1">
                             ₹{(calculateItemTotal(item) + calculateItemTax(item)).toFixed(2)}
                           </div>

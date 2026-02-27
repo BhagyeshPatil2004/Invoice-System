@@ -2,6 +2,9 @@ import { useState, useRef, useEffect } from "react";
 import { Plus, Search, MoreHorizontal, Download, FileText, Trash2, Edit, Eye } from "lucide-react";
 import QuotationDialog from "@/components/QuotationDialog";
 import QuotationTemplate from "@/components/QuotationTemplate";
+import { CalendarDateRangePicker } from "@/components/CalendarDateRangePicker";
+import { DateRange } from "react-day-picker";
+import { isWithinInterval, parseISO, startOfDay, endOfDay } from "date-fns";
 import { useData } from "@/contexts/DataContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -29,12 +32,14 @@ export default function Quotations() {
   const {
     invoices,
     setInvoices,
+    quotations,
+    setQuotations,
     bankDetails,
     clients,
     setClients
   } = useData();
-  const [quotations, setQuotations] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [statusDialogOpen, setStatusDialogOpen] = useState(false);
@@ -74,7 +79,7 @@ export default function Quotations() {
   const handleQuotationCreate = async (newQuotation: any) => {
     // Map to Supabase schema
     const quotationForDb = {
-      quotationNumber: newQuotation.id,
+      quotationNumber: newQuotation.quotationNumber,
       issueDate: newQuotation.issueDate,
       validUntil: newQuotation.validUntil,
       clientName: newQuotation.clientName,
@@ -242,7 +247,23 @@ export default function Quotations() {
     }
   };
 
-  const filteredQuotations = quotations.filter(quote => quote.id.toLowerCase().includes(searchTerm.toLowerCase()) || quote.clientName.toLowerCase().includes(searchTerm.toLowerCase()) || quote.description.toLowerCase().includes(searchTerm.toLowerCase()));
+  const filteredQuotations = quotations.filter(quote => {
+    const displayId = quote.quotationNumber || quote.id;
+    const matchesSearch = displayId.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      quote.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      quote.description.toLowerCase().includes(searchTerm.toLowerCase());
+
+    let matchesDate = true;
+    if (dateRange?.from) {
+      const quoteDate = parseISO(quote.issueDate);
+      const from = startOfDay(dateRange.from);
+      const to = dateRange.to ? endOfDay(dateRange.to) : endOfDay(dateRange.from);
+
+      matchesDate = isWithinInterval(quoteDate, { start: from, end: to });
+    }
+
+    return matchesSearch && matchesDate;
+  }).sort((a, b) => new Date(b.issueDate).getTime() - new Date(a.issueDate).getTime());
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -292,6 +313,7 @@ export default function Quotations() {
               <Download className="h-4 w-4 mr-2" />
               Export
             </Button>
+            <CalendarDateRangePicker date={dateRange} setDate={setDateRange} />
           </div>
 
           <div className="rounded-lg border border-border overflow-hidden">
@@ -312,7 +334,7 @@ export default function Quotations() {
                   <TableRow key={quote.id} className="hover:bg-accent/50 transition-colors">
                     <TableCell>
                       <div>
-                        <div className="font-medium text-foreground">{quote.id}</div>
+                        <div className="font-medium text-foreground">{quote.quotationNumber || quote.id}</div>
                         <div className="text-sm text-muted-foreground">{quote.description}</div>
                       </div>
                     </TableCell>

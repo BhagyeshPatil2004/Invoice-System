@@ -1,8 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 import { supabase } from "@/supabaseClient";
-import { Plus, Search, MoreHorizontal, Download, FileText, Trash2, Edit, Eye, DollarSign } from "lucide-react";
+import { Plus, Search, MoreHorizontal, Download, FileText, Trash2, Edit, Eye, DollarSign, Mail } from "lucide-react";
 import InvoiceDialog from "@/components/InvoiceDialog";
 import InvoiceTemplate from "@/components/InvoiceTemplate";
+import { CalendarDateRangePicker } from "@/components/CalendarDateRangePicker";
+import { DateRange } from "react-day-picker";
+import { isWithinInterval, parseISO, startOfDay, endOfDay } from "date-fns";
 import { useData } from "@/contexts/DataContext";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -70,6 +73,7 @@ export default function Invoices() {
   const { invoices, setInvoices, bankDetails, clients, setClients } = useData();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [dateRange, setDateRange] = useState<DateRange | undefined>();
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [statusDialogOpen, setStatusDialogOpen] = useState(false);
@@ -133,7 +137,7 @@ export default function Invoices() {
 
     // 2. Update local state with merged data (DB fields + extra local fields)
     if (data) {
-      setInvoices([...invoices, { ...newInvoice, ...data }]);
+      setInvoices([{ ...newInvoice, ...data }, ...invoices]);
     }
 
     // Check if client exists, if not create new one
@@ -234,6 +238,74 @@ export default function Invoices() {
     }
   };
 
+  const handleSendReminder = async (invoice: any) => {
+    const client = clients.find(c => c.name === invoice.clientName);
+
+    if (!client?.email) {
+      toast({
+        title: "No Email Found",
+        description: `Please add an email for ${invoice.clientName} in the Clients page.`,
+        variant: "destructive",
+      });
+      return;
+    }
+
+    toast({
+      title: "Sending Reminder...",
+      description: "Please wait...",
+    });
+
+    try {
+      const { data, error } = await supabase.functions.invoke('send-email', {
+        body: {
+          clientEmail: client.email,
+          invoiceNumber: invoice.invoiceNumber || invoice.id,
+          amount: invoice.amount,
+          dueDate: invoice.dueDate,
+          clientName: invoice.clientName
+        },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Email Sent Successfully",
+        description: `Reminder sent to ${client.email}`,
+      });
+    } catch (error: any) {
+      console.error("Email Error:", error);
+
+      // Try to extract the actual error message from various possible locations
+      let errorMessage = "Check if the 'send-email' function is deployed and secrets are set.";
+
+      if (error.message) {
+        // If it's a specific Supabase error
+        errorMessage = error.message;
+
+        // If the error has a context object (common in Supabase functions errors)
+        if (error.context && error.context.json) {
+          try {
+            // Attempt to read the JSON body of the error response
+            const errorBody = await error.context.json();
+            if (errorBody.error) {
+              errorMessage = errorBody.error;
+            }
+          } catch (e) {
+            // verification failed, keep default
+          }
+        }
+      }
+
+      toast({
+        title: "Failed to Send",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    }
+  };
+
+
+
   const handleAdvancePaymentClick = (invoice: any) => {
     setSelectedInvoice(invoice);
     setAdvancePaymentAmount(invoice.advancePayment || 0);
@@ -295,22 +367,31 @@ export default function Invoices() {
   };
 
   const filteredInvoices = invoices.filter(invoice => {
-    const matchesSearch = invoice.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    const displayId = invoice.invoiceNumber || invoice.id;
+    const matchesSearch = displayId.toLowerCase().includes(searchTerm.toLowerCase()) ||
       invoice.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       invoice.description.toLowerCase().includes(searchTerm.toLowerCase());
-
     const matchesStatus = statusFilter === "all" ||
       (statusFilter === "pending" && (invoice.status === "pending" || invoice.status === "sent")) ||
       (statusFilter === "paid" && invoice.status === "paid") ||
       (statusFilter === "draft" && invoice.status === "draft") ||
       (statusFilter === "overdue" && invoice.status === "overdue");
 
-    return matchesSearch && matchesStatus;
-  });
+    let matchesDate = true;
+    if (dateRange?.from) {
+      const invoiceDate = parseISO(invoice.issueDate);
+      const from = startOfDay(dateRange.from);
+      const to = dateRange.to ? endOfDay(dateRange.to) : endOfDay(dateRange.from);
 
-  const totalAmount = invoices.reduce((sum, invoice) => sum + invoice.amount, 0);
-  const paidAmount = invoices.filter(i => i.status === 'paid').reduce((sum, invoice) => sum + invoice.amount, 0);
-  const pendingAmount = invoices.filter(i => i.status === 'pending' || i.status === 'sent').reduce((sum, invoice) => sum + invoice.amount, 0);
+      matchesDate = isWithinInterval(invoiceDate, { start: from, end: to });
+    }
+
+    return matchesSearch && matchesStatus && matchesDate;
+  }).sort((a, b) => new Date(b.issueDate).getTime() - new Date(a.issueDate).getTime());
+
+  const totalAmount = filteredInvoices.reduce((sum, invoice) => sum + invoice.amount, 0);
+  const paidAmount = filteredInvoices.filter(i => i.status === 'paid').reduce((sum, invoice) => sum + invoice.amount, 0);
+  const pendingAmount = filteredInvoices.filter(i => i.status === 'pending' || i.status === 'sent').reduce((sum, invoice) => sum + invoice.amount, 0);
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -438,6 +519,7 @@ export default function Invoices() {
               <Download className="h-4 w-4 mr-2" />
               Export
             </Button>
+            <CalendarDateRangePicker date={dateRange} setDate={setDateRange} />
           </div>
 
           <div className="rounded-lg border border-border overflow-hidden overflow-x-auto">
@@ -456,7 +538,7 @@ export default function Invoices() {
               <TableBody>
                 {filteredInvoices.map((invoice) => (
                   <TableRow key={invoice.id} className="hover:bg-white/5 transition-colors border-white/5">
-                    <TableCell className="font-medium">{invoice.id}</TableCell>
+                    <TableCell className="font-medium">{invoice.invoiceNumber || invoice.id}</TableCell>
                     <TableCell className="whitespace-nowrap">{invoice.clientName}</TableCell>
                     <TableCell>
                       <div className={`font-semibold ${getStatusColor(invoice.status)}`}>
@@ -489,6 +571,10 @@ export default function Invoices() {
                             <Eye className="h-4 w-4 mr-2" />
                             View Invoice
                           </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleSendReminder(invoice)}>
+                            <Mail className="h-4 w-4 mr-2" />
+                            Send Reminder
+                          </DropdownMenuItem>
                           <DropdownMenuItem onClick={() => handleAdvancePaymentClick(invoice)}>
                             <DollarSign className="h-4 w-4 mr-2" />
                             Advance Payment
@@ -512,22 +598,25 @@ export default function Invoices() {
                       </DropdownMenu>
                     </TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                ))
+                }
+              </TableBody >
+            </Table >
+          </div >
 
-          {filteredInvoices.length === 0 && (
-            <div className="text-center py-12 text-muted-foreground">
-              <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
-              <p>No invoices found matching your search.</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+          {
+            filteredInvoices.length === 0 && (
+              <div className="text-center py-12 text-muted-foreground">
+                <FileText className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p>No invoices found matching your search.</p>
+              </div>
+            )
+          }
+        </CardContent >
+      </Card >
 
       {/* View Invoice Dialog */}
-      <AlertDialog open={viewDialogOpen} onOpenChange={setViewDialogOpen}>
+      < AlertDialog open={viewDialogOpen} onOpenChange={setViewDialogOpen} >
         <AlertDialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
           <AlertDialogHeader>
             <AlertDialogTitle>Invoice Preview</AlertDialogTitle>
@@ -578,10 +667,10 @@ export default function Invoices() {
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog>
+      </AlertDialog >
 
       {/* Status Update Dialog */}
-      <AlertDialog open={statusDialogOpen} onOpenChange={setStatusDialogOpen}>
+      < AlertDialog open={statusDialogOpen} onOpenChange={setStatusDialogOpen} >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Update Invoice Status</AlertDialogTitle>
@@ -609,10 +698,10 @@ export default function Invoices() {
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog>
+      </AlertDialog >
 
       {/* Advance Payment Update Dialog */}
-      <AlertDialog open={advancePaymentDialogOpen} onOpenChange={setAdvancePaymentDialogOpen}>
+      < AlertDialog open={advancePaymentDialogOpen} onOpenChange={setAdvancePaymentDialogOpen} >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Update Advance Payment</AlertDialogTitle>
@@ -657,10 +746,10 @@ export default function Invoices() {
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog>
+      </AlertDialog >
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+      < AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen} >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Are you sure?</AlertDialogTitle>
@@ -675,7 +764,7 @@ export default function Invoices() {
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
-      </AlertDialog>
-    </div>
+      </AlertDialog >
+    </div >
   );
 }

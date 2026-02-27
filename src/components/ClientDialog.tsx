@@ -45,7 +45,7 @@ export default function ClientDialog({ open, onOpenChange, onClientCreate, onCli
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!name || !email) {
       toast({
         title: "Validation Error",
@@ -67,7 +67,7 @@ export default function ClientDialog({ open, onOpenChange, onClientCreate, onCli
       };
 
       onClientUpdate?.(updatedClient);
-      
+
       toast({
         title: "Success",
         description: "Client updated successfully",
@@ -86,11 +86,10 @@ export default function ClientDialog({ open, onOpenChange, onClientCreate, onCli
         outstanding: 0,
         totalInvoices: 0,
         lastInvoice: "N/A",
-        createdAt: new Date().toISOString().split('T')[0],
       };
 
       onClientCreate(newClient);
-      
+
       toast({
         title: "Success",
         description: "Client created successfully",
@@ -116,7 +115,7 @@ export default function ClientDialog({ open, onOpenChange, onClientCreate, onCli
             {isEditMode ? "Update client information" : "Add a new client to your system"}
           </DialogDescription>
         </DialogHeader>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
@@ -128,7 +127,7 @@ export default function ClientDialog({ open, onOpenChange, onClientCreate, onCli
                 placeholder="Enter client name"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="email">Email *</Label>
               <Input
@@ -151,7 +150,7 @@ export default function ClientDialog({ open, onOpenChange, onClientCreate, onCli
                 placeholder="+91 9876543210"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="company">Company</Label>
               <Input
